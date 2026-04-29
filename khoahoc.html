@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Adventure - Master Course 2024</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #f43f5e;
+            --accent: #fbbf24;
+            --bg: #0f172a;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: var(--bg);
+            color: #f8fafc;
+            margin: 0;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .font-bungee { font-family: 'Bungee', cursive; }
+
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .topic-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+        .topic-card:hover { transform: translateY(-8px); filter: brightness(1.1); }
+
+        .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
+        .v-item { 
+            background: rgba(255,255,255,0.05); 
+            border-radius: 1.5rem; 
+            padding: 1rem; 
+            text-align: center;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .v-item:hover { background: var(--primary); transform: scale(1.05); }
+
+        .mindmap-branch { stroke: var(--primary); stroke-width: 3; stroke-dasharray: 5; animation: dash 5s linear infinite; }
+        @keyframes dash { to { stroke-dashoffset: -50; } }
+
+        #game-canvas {
+            height: 400px;
+            background: radial-gradient(circle at center, #1e3a8a 0%, #0f172a 100%);
+            border-radius: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #334155;
+        }
+        .neon-glow { box-shadow: 0 0 20px rgba(99, 102, 241, 0.6); }
+        .ball-glow { filter: drop-shadow(0 0 15px #fff); }
+
+        .nav-active { background: var(--primary) !important; color: white !important; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4); }
+        .tab-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .animate-slide { animation: slideIn 0.4s ease-out forwards; }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 2rem; overflow: hidden; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .shake { animation: shake 0.4s ease-in-out; }
+    </style>
+</head>
+<body class="bg-slate-950">
+
+    <nav class="fixed top-0 left-0 w-full h-20 glass z-[100] px-6 flex items-center justify-between shadow-xl">
+        <div class="flex items-center gap-4 cursor-pointer" onclick="showView('home')">
+            <div class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-2xl shadow-lg">🚀</div>
+            <h1 class="text-xl md:text-2xl font-bungee text-white hidden sm:block">ENGLISH MASTER <span class="text-indigo-400">G5</span></h1>
+        </div>
+        
+        <div class="flex items-center gap-3">
+            <a href="userview.html" class="flex items-center gap-2 bg-slate-800 hover:bg-rose-600 px-4 py-2 rounded-xl border border-white/10 transition-all font-bold text-sm text-white">
+                <span>🔙</span> Quay lại hệ thống
+            </a>
+            
+            <div class="bg-slate-800/80 px-4 py-2 rounded-2xl flex items-center gap-2 border border-white/10">
+                <span class="text-yellow-400 text-xl">⭐</span>
+                <span id="score-val" class="font-bungee text-lg">0</span>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center font-bold">U</div>
+        </div>
+    </nav>
+
+    <main class="pt-28 pb-12 px-4 md:px-12 max-w-7xl mx-auto">
+        
+        <div id="view-home" class="animate-slide">
+            <header class="mb-12 text-center">
+                <h2 class="text-4xl md:text-6xl font-bungee mb-4 leading-tight italic">Level Up Your <span class="text-indigo-500">English</span> Skills!</h2>
+                <p class="text-slate-400 text-lg max-w-2xl mx-auto">Hành trình 10 bước chinh phục tiếng Anh lớp 5 với trải nghiệm học tập hiện đại.</p>
+            </header>
+
+            <div id="topics-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        </div>
+
+        <div id="view-topic" class="hidden animate-slide">
+            <div class="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between mb-10">
+                <div class="flex items-center gap-5">
+                    <button onclick="showView('home')" class="w-14 h-14 glass rounded-2xl flex items-center justify-center text-2xl hover:bg-white/10 transition-all" title="Quay lại danh sách bài học">←</button>
+                    <div>
+                        <h3 id="topic-title" class="text-3xl font-bungee text-indigo-400 uppercase tracking-tighter">Topic Title</h3>
+                        <div class="flex items-center gap-3 mt-1">
+                            <div class="w-40 h-2 bg-slate-800 rounded-full overflow-hidden">
+                                <div id="topic-progress" class="h-full bg-green-500 transition-all duration-700" style="width: 30%"></div>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-500 uppercase">Progress: <span id="progress-percent">0%</span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-2 no-scrollbar overflow-x-auto w-full md:w-auto p-1">
+                    <button onclick="switchTab('learn')" class="tab-btn px-6 py-3 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 whitespace-nowrap">📺 Học</button>
+                    <button onclick="switchTab('vocab')" class="tab-btn px-6 py-3 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 whitespace-nowrap">📚 Từ vựng</button>
+                    <button onclick="switchTab('mindmap')" class="tab-btn px-6 py-3 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 whitespace-nowrap">🧠 Mindmap</button>
+                    <button onclick="switchTab('quiz')" class="tab-btn px-6 py-3 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 whitespace-nowrap">✍️ Luyện tập</button>
+                    <button onclick="switchTab('game')" class="tab-btn px-6 py-3 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 whitespace-nowrap">🎮 Arena</button>
+                </div>
+            </div>
+
+            <div id="tab-learn" class="tab-content glass p-8 rounded-[3rem]">
+                <div class="grid lg:grid-cols-3 gap-10">
+                    <div class="lg:col-span-2">
+                        <div class="video-wrapper shadow-2xl neon-glow">
+                            <iframe id="topic-video" src="" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="bg-indigo-600/10 p-6 rounded-[2rem] border border-indigo-500/20">
+                            <h4 class="font-bungee text-indigo-400 mb-4">Mục tiêu bài học</h4>
+                            <ul id="topic-goals" class="space-y-3 text-slate-300 font-medium text-sm"></ul>
+                        </div>
+                        <div class="bg-slate-800/40 p-6 rounded-[2rem] border border-white/5">
+                            <h4 class="font-bungee text-yellow-500 mb-4">Ghi chú</h4>
+                            <div id="topic-links" class="flex flex-col gap-3 text-slate-400 text-sm">
+                                Lắng nghe kỹ phát âm trong video và thực hành lại các mẫu câu quan trọng.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-vocab" class="tab-content hidden animate-slide">
+                <div class="vocab-grid" id="vocab-container"></div>
+            </div>
+
+            <div id="tab-mindmap" class="tab-content hidden glass p-10 rounded-[3rem] min-h-[500px] flex items-center justify-center relative overflow-hidden">
+                <svg id="mm-svg" class="absolute inset-0 w-full h-full pointer-events-none"></svg>
+                <div id="mm-container" class="relative z-10 w-full h-full flex items-center justify-center"></div>
+            </div>
+
+            <div id="tab-quiz" class="tab-content hidden glass p-8 rounded-[3rem] max-w-4xl mx-auto">
+                <div id="quiz-header" class="flex justify-between items-center mb-10 border-b border-white/10 pb-6">
+                    <div class="flex gap-4">
+                        <span class="bg-green-500/20 text-green-400 px-4 py-1 rounded-full text-xs font-bold">KỸ NĂNG: ĐA DẠNG</span>
+                        <span id="quiz-counter" class="text-xs font-bold text-slate-400 uppercase tracking-widest">Question 1/5</span>
+                    </div>
+                </div>
+                <div id="quiz-body" class="min-h-[300px]"></div>
+            </div>
+
+            <div id="tab-game" class="tab-content hidden animate-slide">
+                <div class="max-w-2xl mx-auto">
+                    <div id="game-canvas" class="shadow-2xl mb-8 flex flex-col items-center justify-center">
+                        <div class="absolute top-0 left-0 w-full p-6 flex justify-between items-center z-20">
+                            <div class="text-xs font-bold text-slate-400">COMBO: <span id="game-combo" class="text-yellow-400">0</span></div>
+                            <div id="game-timer-ring" class="w-12 h-12 rounded-full border-4 border-indigo-500 flex items-center justify-center font-bungee text-sm">15</div>
+                        </div>
+                        <div id="g-ball" class="text-7xl mb-12 ball-glow transition-all duration-500">⚽</div>
+                        <div id="g-q-text" class="text-2xl font-bungee text-white text-center px-6">Ready?</div>
+                    </div>
+                    <div id="g-options" class="grid grid-cols-2 gap-4"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const TOPICS = [
+            { id: 1, title: "Personal Info", icon: "👤", color: "from-blue-600 to-indigo-800", video: "https://www.canva.com/design/DAHGwMxRh_w/Kw-4jQMuMMalJ9qgTaEypg/view?embed",
+                goals: ["Hỏi và trả lời về địa chỉ", "Nói về quê hương", "Giới thiệu thông tin cá nhân cơ bản"],
+                vocab: [
+                    { t: "Address", m: "Địa chỉ", p: "/əˈdres/", img: "📍" }, { t: "Hometown", m: "Quê quán", p: "/ˈhəʊmtaʊn/", img: "🏡" },
+                    { t: "Province", m: "Tỉnh thành", p: "/ˈprɒvɪns/", img: "🗺️" }, { t: "District", m: "Quận/Huyện", p: "/ˈdɪstrɪkt/", img: "🏢" },
+                    { t: "Commune", m: "Xã/Phường", p: "/ˈkɒmjuːn/", img: "🏘️" }, { t: "Nationality", m: "Quốc tịch", p: "/ˌnæʃəˈnæləti/", img: "🇻🇳" },
+                    { t: "Flat", m: "Căn hộ", p: "/flæt/", img: "🏢" }, { t: "Tower", m: "Tòa tháp", p: "/ˈtaʊə(r)/", img: "🏙️" },
+                    { t: "Quiet", m: "Yên tĩnh", p: "/ˈkwaɪət/", img: "🤫" }, { t: "Crowded", m: "Đông đúc", p: "/ˈkraʊdɪd/", img: "👨‍👩‍👧" },
+                    { t: "Modern", m: "Hiện đại", p: "/ˈmɒdn/", img: "📱" }, { t: "Village", m: "Ngôi làng", p: "/ˈvɪlɪdʒ/", img: "🌳" },
+                    { t: "Lane", m: "Đường nhỏ/Ngõ", p: "/leɪn/", img: "🛣️" }, { t: "Birthday", m: "Ngày sinh", p: "/ˈbɜːθdeɪ/", img: "🎂" },
+                    { t: "Identity card", m: "Thẻ CCCD", p: "/aɪˈdentəti/", img: "🪪" }, { t: "Hobby", m: "Sở thích", p: "/ˈhɒbi/", img: "🎨" },
+                    { t: "Primary school", m: "Trường tiểu học", p: "/ˈpraɪməri/", img: "🎒" }, { t: "Street", m: "Đường phố", p: "/striːt/", img: "🛣️" },
+                    { t: "Avenue", m: "Đại lộ", p: "/ˈævənjuː/", img: "🌴" }, { t: "Floor", m: "Tầng", p: "/flɔː(r)/", img: "📶" }
+                ],
+                quiz: [
+                    { type: 'listen', q: "Address", a: "Address", o: ["Address", "Hometown", "Province"], audio: "Address" },
+                    { type: 'choice', q: "Where do you live? - I live ___ a small flat.", o: ["on", "in", "at"], a: "in" },
+                    { type: 'write', q: "Sắp xếp: address / My / is / 51, / Street. / Hoan / Kiem", a: "My address is 51, Hoan Kiem Street.", hint: "Mở đầu bằng 'My'..." },
+                    { type: 'read', q: "Linh lives in a quiet village in the north. - Where does Linh live?", o: ["A big city", "A quiet village", "A flat"], a: "A quiet village" }
+                ]
+            },
+            { id: 2, title: "Family & Home", icon: "🏠", color: "from-rose-500 to-pink-700", video: "https://www.canva.com/design/DAHGwNsgmO8/mD6te_WyUJxSB58M_wtwow/view?embed",
+                goals: ["Mô tả gia đình", "Các phòng trong nhà", "Hoạt động hàng ngày tại nhà"],
+                vocab: [
+                    { t: "Grandparents", m: "Ông bà", p: "/ˈɡrænpeərənts/", img: "👴👵" }, { t: "Relative", m: "Họ hàng", p: "/ˈrelətɪv/", img: "👥" },
+                    { t: "Brother", m: "Anh/Em trai", p: "/ˈbrʌðə(r)/", img: "👦" }, { t: "Sister", m: "Chị/Em gái", p: "/ˈsɪstə(r)/", img: "👧" },
+                    { t: "Kitchen", m: "Bếp", p: "/ˈkɪtʃɪn/", img: "🍳" }, { t: "Living room", m: "Phòng khách", p: "/ˈlɪvɪŋ ruːm/", img: "🛋️" },
+                    { t: "Bedroom", m: "Phòng ngủ", p: "/ˈbedruːm/", img: "🛏️" }, { t: "Garden", m: "Khu vườn", p: "/ˈɡɑːdn/", img: "🌻" },
+                    { t: "Balcony", m: "Ban công", p: "/ˈbælkəni/", img: "🏙️" }, { t: "Upstairs", m: "Tầng trên", p: "/ˌʌpˈsteəz/", img: "⬆️" },
+                    { t: "Furniture", m: "Nội thất", p: "/ˈfɜːnɪtʃə(r)/", img: "🪑" }, { t: "Air conditioner", m: "Máy lạnh", p: "/ˈeə kəndɪʃənə/", img: "❄️" },
+                    { t: "Washing machine", m: "Máy giặt", p: "/ˈwɒʃɪŋ məʃiːn/", img: "🧼" }, { t: "Cozy", m: "Ấm cúng", p: "/ˈkəʊzi/", img: "🍵" },
+                    { t: "Household chores", m: "Việc nhà", p: "/ˈhaʊshəʊld/", img: "🧹" }, { t: "Parents", m: "Bố mẹ", p: "/ˈpeərənts/", img: "👩‍❤️‍👨" },
+                    { t: "Terrace house", m: "Nhà liền kề", p: "/ˈterəst/", img: "🏘️" }, { t: "Backyard", m: "Sân sau", p: "/ˌbækˈjɑːd/", img: "🌳" },
+                    { t: "Clean", m: "Dọn dẹp", p: "/kliːn/", img: "✨" }, { t: "Cook", m: "Nấu ăn", p: "/kʊk/", img: "👩‍🍳" }
+                ],
+                quiz: [
+                    { type: 'choice', q: "My bedroom is on the ___ floor.", o: ["second", "two", "twice"], a: "second" }
+                ]
+            },
+            { id: 3, title: "School & Subjects", icon: "📚", color: "from-emerald-500 to-teal-800", video: "https://canva.link/vd6hvz3gvvxdm55",
+                goals: ["Tên các môn học", "Nói về tần suất môn học", "Lý do yêu thích môn học"],
+                vocab: [
+                    { t: "Science", m: "Khoa học", p: "/ˈsaɪəns/", img: "🧪" }, { t: "Physical Education", m: "Thể dục (PE)", p: "/ˈfɪzɪkl/", img: "⚽" },
+                    { t: "Informatics", m: "Tin học", p: "/ˌɪnfəˈmætɪks/", img: "💻" }, { t: "History", m: "Lịch sử", p: "/ˈhɪstri/", img: "📜" },
+                    { t: "Geography", m: "Địa lý", p: "/dʒiˈɒɡrəfi/", img: "🌍" }, { t: "Music", m: "Âm nhạc", p: "/ˈmjuːzɪk/", img: "🎵" },
+                    { t: "Art", m: "Mỹ thuật", p: "/ɑːt/", img: "🎨" }, { t: "Literature", m: "Ngữ văn", p: "/ˈlɪtrətʃə(r)/", img: "📝" },
+                    { t: "Timetable", m: "Thời khóa biểu", p: "/ˈtaɪmteɪbl/", img: "📅" }, { t: "Favorite", m: "Yêu thích", p: "/ˈfeɪvərɪt/", img: "💖" },
+                    { t: "Project", m: "Dự án/Bải tập", p: "/ˈprɒdʒekt/", img: "📁" }, { t: "Presentation", m: "Thuyết trình", p: "/ˌpreznˈteɪʃn/", img: "🗣️" },
+                    { t: "Uniform", m: "Đồng phục", p: "/ˈjuːnɪfɔːm/", img: "👔" }, { t: "Break time", m: "Giờ giải lao", p: "/breɪk/", img: "🥪" },
+                    { t: "Library", m: "Thư viện", p: "/ˈlaɪbrəri/", img: "📚" }, { t: "Classmate", m: "Bạn cùng lớp", p: "/ˈklɑːsmeɪt/", img: "🤝" },
+                    { t: "Maths", m: "Toán", p: "/mæθs/", img: "➕" }, { t: "Dictionary", m: "Từ điển", p: "/ˈdɪkʃənri/", img: "📖" },
+                    { t: "English", m: "Tiếng Anh", p: "/ˈɪŋɡlɪʃ/", img: "🇬🇧" }, { t: "Lesson", m: "Bài học", p: "/ˈlesn/", img: "📗" }
+                ],
+                quiz: [
+                    { type: 'choice', q: "How ___ do you have English? - Four times a week.", o: ["often", "many", "old"], a: "often" }
+                ]
+            },
+            { id: 4, title: "Holidays & Travel", icon: "✈️", color: "from-orange-500 to-yellow-700", video: "", 
+                goals: ["Nói về các kỳ nghỉ", "Hỏi về điểm đến trong tương lai", "Phương tiện giao thông"],
+                vocab: [
+                    { t: "Holiday", m: "Kỳ nghỉ", p: "/ˈhɒlədeɪ/", img: "🏖️" }, { t: "Ancient town", m: "Phố cổ", p: "/ˈeɪnʃənt/", img: "🏮" },
+                    { t: "Seaside", m: "Bờ biển", p: "/ˈsiːsaɪd/", img: "🌊" }, { t: "Island", m: "Hòn đảo", p: "/ˈaɪlənd/", img: "🏝️" },
+                    { t: "Imperial City", m: "Cố đô", p: "/ɪmˈpɪəriəl/", img: "🏯" }, { t: "Coach", m: "Xe khách", p: "/kəʊtʃ/", img: "🚌" },
+                    { t: "Underground", m: "Tàu điện ngầm", p: "/ˌʌndəˈɡraʊnd/", img: "🚇" }, { t: "Boat", m: "Con thuyền", p: "/bəʊt/", img: "🚤" },
+                    { t: "Plane", m: "Máy bay", p: "/pleɪn/", img: "✈️" }, { t: "Trip", m: "Chuyến đi", p: "/trɪp/", img: "🎒" },
+                    { t: "Bay", m: "Vịnh", p: "/beɪ/", img: "🛶" }, { t: "Caves", m: "Hang động", p: "/keɪvz/", img: "🦇" },
+                    { t: "Souvenir", m: "Quà lưu niệm", p: "/ˌsuːvəˈnɪə(r)/", img: "🎁" }, { t: "Sandcastle", m: "Lâu đài cát", p: "/ˈsændkɑːsl/", img: "🏰" },
+                    { t: "Sunbathe", m: "Tắm nắng", p: "/ˈsʌnbeɪð/", img: "☀️" }, { t: "Motorbike", m: "Xe máy", p: "/ˈməʊtəbaɪk/", img: "🛵" },
+                    { t: "Railway station", m: "Ga tàu hỏa", p: "/ˈreɪlweɪ/", img: "🚉" }, { t: "Airport", m: "Sân bay", p: "/ˈeəpɔːt/", img: "🛫" },
+                    { t: "Passport", m: "Hộ chiếu", p: "/ˈpɑːspɔːt/", img: "🛂" }, { t: "Explore", m: "Khám phá", p: "/ɪkˈsplɔː(r)/", img: "🧭" }
+                ],
+                quiz: [
+                    { type: 'choice', q: "Where did you go ___ holiday? - I went to Ha Long Bay.", o: ["on", "at", "in"], a: "on" },
+                    { type: 'write', q: "Sắp xếp: get / How / did / there? / you", a: "How did you get there?", hint: "Câu hỏi về phương tiện" }
+                ]
+            },
+            { id: 5, title: "Daily Routines", icon: "⏰", color: "from-purple-600 to-indigo-900", video: "", 
+                goals: ["Hoạt động trong ngày", "Trạng từ chỉ tần suất", "Sở thích buổi tối"],
+                vocab: [
+                    { t: "Morning", m: "Buổi sáng", p: "/ˈmɔːnɪŋ/", img: "🌅" }, { t: "Afternoon", m: "Buổi chiều", p: "/ˌɑːftəˈnuːn/", img: "☀️" },
+                    { t: "Evening", m: "Buổi tối", p: "/ˈiːvnɪŋ/", img: "🌙" }, { t: "Always", m: "Luôn luôn", p: "/ˈɔːlweɪz/", img: "💯" },
+                    { t: "Usually", m: "Thường xuyên", p: "/ˈjuːʒuəli/", img: "📈" }, { t: "Often", m: "Hay làm", p: "/ˈɒfn/", img: "📊" },
+                    { t: "Sometimes", m: "Thỉnh thoảng", p: "/ˈsʌmtaɪmz/", img: "📉" }, { t: "Never", m: "Không bao giờ", p: "/ˈnevə(r)/", img: "🚫" },
+                    { t: "Brush teeth", m: "Đánh răng", p: "/brʌʃ tiːθ/", img: "🪥" }, { t: "Wash face", m: "Rửa mặt", p: "/wɒʃ feɪs/", img: "🧼" },
+                    { t: "Do homework", m: "Làm bài tập", p: "/duː ˈhəʊmwɜːk/", img: "📝" }, { t: "Project", m: "Dự án", p: "/ˈprɒdʒekt/", img: "📁" },
+                    { t: "Cook dinner", m: "Nấu bữa tối", p: "/kʊk ˈdɪnə(r)/", img: "🍲" }, { t: "Watch TV", m: "Xem TV", p: "/wɒtʃ ˌtiː ˈviː/", img: "📺" },
+                    { t: "Internet", m: "Mạng", p: "/ˈɪntənet/", img: "🌐" }, { t: "Partner", m: "Bạn đồng hành", p: "/ˈpɑːtnə(r)/", img: "🤝" },
+                    { t: "Morning exercise", m: "Tập thể dục sáng", p: "/ˈmɔːnɪŋ ˈeksəsaɪz/", img: "🤸" }, { t: "Library", m: "Thư viện", p: "/ˈlaɪbrəri/", img: "📚" },
+                    { t: "Ride a bike", m: "Đi xe đạp", p: "/raɪd ə baɪk/", img: "🚲" }, { t: "Twice a month", m: "2 lần mỗi tháng", p: "/twaɪs/", img: "🗓️" }
+                ],
+                quiz: [
+                    { type: 'choice', q: "I ___ go to the library. I like reading books.", o: ["never", "usually", "seldom"], a: "usually" },
+                    { type: 'write', q: "Sắp xếp: you / do / What / afternoon? / do / in / the", a: "What do you do in the afternoon?", hint: "Hỏi về hoạt động" }
+                ]
+            },
+            { id: 6, title: "Past Events", icon: "🕰️", color: "from-gray-700 to-black", video: "", 
+                goals: ["Kể về sự kiện đã qua", "Thì quá khứ đơn cơ bản", "Các hoạt động vui chơi"],
+                vocab: [
+                    { t: "Yesterday", m: "Hôm qua", p: "/ˈjestədeɪ/", img: "🔙" }, { t: "Last week", m: "Tuần trước", p: "/lɑːst wiːk/", img: "📅" },
+                    { t: "Birthday party", m: "Tiệc sinh nhật", p: "/ˈpɑːti/", img: "🎉" }, { t: "Invite", m: "Mời", p: "/ɪnˈvaɪt/", img: "✉️" },
+                    { t: "Join", m: "Tham gia", p: "/dʒɔɪn/", img: "🙋" }, { t: "Enjoy", m: "Thưởng thức", p: "/ɪnˈdʒɔɪ/", img: "😊" },
+                    { t: "Festival", m: "Lễ hội", p: "/ˈfestɪvl/", img: "🎡" }, { t: "Funfair", m: "Hội chợ vui chơi", p: "/ˈfʌnfeə(r)/", img: "🎠" },
+                    { t: "Chat", m: "Tán gẫu", p: "/tʃæt/", img: "💬" }, { t: "Hide and seek", m: "Trốn tìm", p: "/haɪd ænd siːk/", img: "🙈" },
+                    { t: "Cartoon", m: "Phim hoạt hình", p: "/kɑːˈtuːn/", img: "🎬" }, { t: "Present", m: "Quà tặng", p: "/ˈpreznt/", img: "🎁" },
+                    { t: "Comics", m: "Truyện tranh", p: "/ˈkɒmɪks/", img: "📖" }, { t: "Special food", m: "Món ăn đặc biệt", p: "/ˈspeʃl/", img: "🍱" },
+                    { t: "Drink", m: "Đồ uống", p: "/drɪŋk/", img: "🥤" }, { t: "Dance", m: "Nhảy múa", p: "/dɑːns/", img: "💃" },
+                    { t: "Sing", m: "Hát", p: "/sɪŋ/", img: "🎤" }, { t: "Repeat", m: "Lặp lại", p: "/rɪˈpiːt/", img: "🔁" },
+                    { t: "Suddenly", m: "Bất ngờ", p: "/ˈsʌdənli/", img: "⚡" }, { t: "End", m: "Kết thúc", p: "/end/", img: "🏁" }
+                ],
+                quiz: [
+                    { type: 'choice', q: "Did you go to the party? - Yes, I ___.", o: ["do", "did", "does"], a: "did" },
+                    { type: 'write', q: "Sắp xếp: We / food / enjoyed / and / the / drink.", a: "We enjoyed the food and drink.", hint: "Câu kể quá khứ" }
+                ]
+            },
+            { id: 7, title: "Future Plans", icon: "🔮", color: "from-cyan-500 to-blue-600", video: "", 
+                goals: ["Nói về dự định tương lai", "Câu điều kiện If loại 0/1 cơ bản", "Địa điểm du lịch"],
+                vocab: [
+                    { t: "Tomorrow", m: "Ngày mai", p: "/təˈmɒrəʊ/", img: "🔜" }, { t: "Next month", m: "Tháng tới", p: "/nekst/", img: "🗓️" },
+                    { t: "Countryside", m: "Nông thôn", p: "/ˈkʌntrisaɪd/", img: "🌾" }, { t: "Mountain", m: "Núi", p: "/ˈmaʊntən/", img: "⛰️" },
+                    { t: "Explore", m: "Khám phá", p: "/ɪkˈsplɔː(r)/", img: "🧭" }, { t: "Boat cruise", m: "Du thuyền", p: "/bəʊt kruːz/", img: "🛳️" },
+                    { t: "Build", m: "Xây dựng", p: "/bɪld/", img: "🏗️" }, { t: "Sandcastle", m: "Lâu đài cát", p: "/ˈsændkɑːsl/", img: "🏰" },
+                    { t: "Seafood", m: "Hải sản", p: "/ˈsiːfuːd/", img: "🦞" }, { t: "Think", m: "Suy nghĩ", p: "/θɪŋk/", img: "💭" },
+                    { t: "Hope", m: "Hy vọng", p: "/həʊp/", img: "🤞" }, { t: "Probably", m: "Có lẽ", p: "/ˈprɒbəbli/", img: "❓" },
+                    { t: "Villas", m: "Biệt thự", p: "/ˈvɪlə/", img: "🏡" }, { t: "Swim", m: "Bơi", p: "/swɪm/", img: "🏊" },
+                    { t: "Picnic", m: "Dã ngoại", p: "/ˈpɪknɪk/", img: "🧺" }, { t: "Take a trip", m: "Đi du lịch", p: "/trɪp/", img: "🎒" },
+                    { t: "Forest", m: "Rừng", p: "/ˈfɒrɪst/", img: "🌳" }, { t: "River", m: "Con sông", p: "/ˈrɪvə(r)/", img: "🌊" },
+                    { t: "Dream", m: "Ước mơ", p: "/driːm/", img: "✨" }, { t: "Travel", m: "Du lịch", p: "/ˈtrævl/", img: "🌎" }
+                ],
+                quiz: [
+                    { type: 'choice', q: "I think I ___ be on the beach.", o: ["will", "am", "do"], a: "will" },
+                    { type: 'read', q: "Next Sunday, Nam will visit his grandparents in the mountains. - Where will Nam go?", o: ["The beach", "The mountains", "The city"], a: "The mountains" }
+                ]
+            },
+            { id: 8, title: "English & Skills", icon: "💬", color: "from-green-600 to-emerald-800", video: "", 
+                goals: ["Cách học tiếng Anh", "Kỹ năng Nghe-Nói-Đọc-Viết", "Lý do học ngoại ngữ"],
+                vocab: [
+                    { t: "Speak", m: "Nói", p: "/spiːk/", img: "🗣️" }, { t: "Listen", m: "Nghe", p: "/ˈlɪsn/", img: "👂" },
+                    { t: "Read", m: "Đọc", p: "/riːd/", img: "📖" }, { t: "Write", m: "Viết", p: "/raɪt/", img: "✍️" },
+                    { t: "Vocabulary", m: "Từ vựng", p: "/vəˈkæbjələri/", img: "📝" }, { t: "Grammar", m: "Ngữ pháp", p: "/ˈɡræmə(r)/", img: "📐" },
+                    { t: "Pronunciation", m: "Phát âm", p: "/prəˌnʌnsiˈeɪʃn/", img: "🎤" }, { t: "Foreign", m: "Nước ngoài", p: "/ˈfɒrən/", img: "🌍" },
+                    { t: "Practice", m: "Luyện tập", p: "/ˈpræktɪs/", img: "🏋️" }, { t: "New word", m: "Từ mới", p: "/njuː/", img: "✨" },
+                    { t: "Sticky note", m: "Giấy nhớ", p: "/ˈstɪki nəʊt/", img: "🏷️" }, { t: "Aloud", m: "To rõ", p: "/əˈlaʊd/", img: "📣" },
+                    { t: "Necessary", m: "Cần thiết", p: "/ˈnesəsəri/", img: "✅" }, { t: "Communicate", m: "Giao tiếp", p: "/kəˈmjuːnɪkeɪt/", img: "💬" },
+                    { t: "Understand", m: "Hiểu", p: "/ˌʌndəˈstænd/", img: "🧠" }, { t: "Guess", m: "Đoán", p: "/ɡes/", img: "🤔" },
+                    { t: "Meaning", m: "Ý nghĩa", p: "/ˈmiːnɪŋ/", img: "ℹ️" }, { t: "Hobby", m: "Sở thích", p: "/ˈhɒbi/", img: "🎨" },
+                    { t: "English book", m: "Sách tiếng Anh", p: "/bʊk/", img: "📚" }, { t: "Cartoon", m: "Phim hoạt hình", p: "/kɑːˈtuːn/", img: "🎬" }
+                ],
+                quiz: [
+                    { type: 'choice', q: "How do you practice ___? - I speak English every day.", o: ["speaking", "speak", "speaks"], a: "speaking" },
+                    { type: 'write', q: "Sắp xếp: Why / learn / do / English? / you", a: "Why do you learn English?", hint: "Hỏi lý do" }
+                ]
+            },
+            { id: 9, title: "Animals World", icon: "🐘", color: "from-yellow-600 to-red-800", video: "", 
+                goals: ["Tên các loài động vật", "Mô tả đặc điểm động vật", "Các hoạt động của chúng"],
+                vocab: [
+                    { t: "Elephant", m: "Con voi", p: "/ˈelɪfənt/", img: "🐘" }, { t: "Tiger", m: "Con hổ", p: "/ˈtaɪɡə(r)/", img: "🐯" },
+                    { t: "Lion", m: "Sư tử", p: "/ˈlaɪən/", img: "🦁" }, { t: "Monkey", m: "Con khỉ", p: "/ˈmʌŋki/", img: "🐒" },
+                    { t: "Peacock", m: "Con công", p: "/ˈpiːkɒk/", img: "🦚" }, { t: "Gorilla", m: "Con khỉ đột", p: "/ɡəˈrɪlə/", img: "🦍" },
+                    { t: "Python", m: "Con trăn", p: "/ˈpaɪθən/", img: "🐍" }, { t: "Crocodile", m: "Cá sấu", p: "/ˈkrɒkədaɪl/", img: "🐊" },
+                    { t: "Trunk", m: "Vòi voi", p: "/trʌŋk/", img: "👃" }, { t: "Tail", m: "Cái đuôi", p: "/teɪl/", img: "🐕" },
+                    { t: "Fur", m: "Lông thú", p: "/fɜː(r)/", img: "🧶" }, { t: "Slowly", m: "Chậm chạp", p: "/ˈsləʊli/", img: "🐢" },
+                    { t: "Quickly", m: "Nhanh chóng", p: "/ˈkwɪkli/", img: "⚡" }, { t: "Loudly", m: "Ồn ào", p: "/ˈlaʊdli/", img: "🔊" },
+                    { t: "Beautifully", m: "Đẹp đẽ", p: "/ˈbjuːtɪfli/", img: "✨" }, { t: "Quietly", m: "Yên tĩnh", p: "/ˈkwaɪətli/", img: "🤫" },
+                    { t: "Roar", m: "Gầm", p: "/rɔː(r)/", img: "📢" }, { t: "Swing", m: "Đu đưa", p: "/swɪŋ/", img: "🌲" },
+                    { t: "Jump", m: "Nhảy", p: "/dʒʌmp/", img: "🦘" }, { t: "Move", m: "Di chuyển", p: "/muːv/", img: "🏃" }
+                ],
+                quiz: [
+                    { type: 'choice', q: "What did the tigers do when you were there? - They ___ loudly.", o: ["roar", "roared", "roaring"], a: "roared" },
+                    { type: 'read', q: "Peacocks moved beautifully. - How did peacocks move?", o: ["Slowly", "Beautifully", "Loudly"], a: "Beautifully" }
+                ]
+            },
+            { id: 10, title: "Sports Day", icon: "🏆", color: "from-blue-400 to-indigo-700", video: "", 
+                goals: ["Các môn thể thao", "Nói về sự kiện trường học", "Các hoạt động thi đấu"],
+                vocab: [
+                    { t: "Sports Day", m: "Ngày hội thể thao", p: "/spɔːts/", img: "👟" }, { t: "Competition", m: "Cuộc thi", p: "/ˌkɒmpəˈtɪʃn/", img: "🥇" },
+                    { t: "Take part in", m: "Tham gia", p: "/teɪk pɑːt/", img: "🙋" }, { t: "Win", m: "Thắng", p: "/wɪn/", img: "🏆" },
+                    { t: "Lose", m: "Thua", p: "/luːz/", img: "👎" }, { t: "Football", m: "Bóng đá", p: "/ˈfʊtbɔːl/", img: "⚽" },
+                    { t: "Badminton", m: "Cầu lông", p: "/ˈbædmɪntən/", img: "🏸" }, { t: "Table tennis", m: "Bóng bàn", p: "/ˈteɪbl ˈtenɪs/", img: "🏓" },
+                    { t: "Basketball", m: "Bóng rổ", p: "/ˈbɑːskɪtbɔːl/", img: "🏀" }, { t: "Gym", m: "Phòng tập", p: "/dʒɪm/", img: "🏋️" },
+                    { t: "Athletics", m: "Điền kinh", p: "/æθˈletɪks/", img: "🏃" }, { t: "Medal", m: "Huy chương", p: "/ˈmedl/", img: "🏅" },
+                    { t: "Against", m: "Đối đầu", p: "/əˈɡenst/", img: "⚔️" }, { t: "Practice", m: "Luyện tập", p: "/ˈpræktɪs/", img: "🔄" },
+                    { t: "Hard", m: "Chăm chỉ", p: "/hɑːd/", img: "💪" }, { t: "Event", m: "Sự kiện", p: "/ɪˈvent/", img: "🎫" },
+                    { t: "Teacher's Day", m: "Ngày Nhà giáo", p: "/ˈtiːtʃə(r)z/", img: "👩‍🏫" }, { t: "School festival", m: "Lễ hội trường", p: "/ˈfestɪvl/", img: "🏫" },
+                    { t: "National Day", m: "Quốc khánh", p: "/ˈnæʃnəl/", img: "🇻🇳" }, { t: "Celebration", m: "Lễ kỷ niệm", p: "/ˌselɪˈbreɪʃn/", img: "🎊" }
+                ],
+                quiz: [
+                    { type: 'choice', q: "When will Sports Day be? - It ___ be next Saturday.", o: ["will", "is", "was"], a: "will" },
+                    { type: 'write', q: "Sắp xếp: take / Are / part / you / going / to / in / the / competition?", a: "Are you going to take part in the competition?", hint: "Câu hỏi dự định" }
+                ]
+            }
+        ];
+
+        let state = {
+            currentTopic: null,
+            score: parseInt(localStorage.getItem('ems_score')) || 0,
+            progress: JSON.parse(localStorage.getItem('ems_prog')) || {},
+            quizIndex: 0,
+            gameTimer: null
+        };
+
+        function init() {
+            renderTopics();
+            updateScoreUI();
+        }
+
+        function renderTopics() {
+            const grid = document.getElementById('topics-grid');
+            grid.innerHTML = TOPICS.map(t => {
+                const prog = state.progress[t.id] || 0;
+                return `
+                    <div onclick="openTopic(${t.id})" class="topic-card glass p-8 rounded-[2.5rem] relative overflow-hidden group border-0 shadow-2xl">
+                        <div class="absolute -right-4 -bottom-4 text-8xl opacity-10 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">${t.icon}</div>
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-center mb-6">
+                                <span class="bg-gradient-to-r ${t.color} px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-white">Unit ${t.id}</span>
+                                ${prog === 100 ? '<span class="text-green-400">✅</span>' : ''}
+                            </div>
+                            <h3 class="text-2xl font-bungee text-white mb-6 leading-tight">${t.title}</h3>
+                            <div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                <div class="h-full bg-indigo-500 transition-all duration-1000" style="width: ${prog}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openTopic(id) {
+            state.currentTopic = TOPICS.find(t => t.id === id);
+            showView('topic');
+            document.getElementById('topic-title').innerText = state.currentTopic.title;
+            document.getElementById('topic-video').src = state.currentTopic.video || "https://www.youtube.com/embed/fWscDFU569E";
+            document.getElementById('topic-goals').innerHTML = state.currentTopic.goals.map(g => `<li>• ${g}</li>`).join('');
+            
+            updateTopicProgress();
+            renderVocab();
+            switchTab('learn');
+        }
+
+        function showView(v) {
+            document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
+            document.getElementById(`view-${v}`).classList.remove('hidden');
+            if(v === 'home') {
+                document.getElementById('topic-video').src = "";
+                clearInterval(state.gameTimer);
+            }
+            window.scrollTo(0,0);
+        }
+
+        function switchTab(t) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('nav-active'));
+            document.getElementById(`tab-${t}`).classList.remove('hidden');
+            
+            const textMap = { learn: 'Học', vocab: 'Từ vựng', mindmap: 'Mindmap', quiz: 'Luyện tập', game: 'Arena' };
+            Array.from(document.querySelectorAll('.tab-btn')).find(b => b.innerText.includes(textMap[t]))?.classList.add('nav-active');
+
+            if(t === 'mindmap') renderMindmap();
+            if(t === 'quiz') startQuiz();
+            if(t === 'game') initGameArena();
+        }
+
+        function renderVocab() {
+            const container = document.getElementById('vocab-container');
+            container.innerHTML = state.currentTopic.vocab.map(v => `
+                <div class="v-item cursor-pointer group" onclick="speak('${v.t}')">
+                    <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">${v.img}</div>
+                    <div class="font-bungee text-sm text-indigo-300 group-hover:text-white">${v.t}</div>
+                    <div class="text-[10px] text-slate-500 font-bold mt-1">${v.p}</div>
+                    <div class="text-xs text-slate-400 mt-2 font-medium opacity-0 group-hover:opacity-100 transition-opacity">${v.m}</div>
+                </div>
+            `).join('');
+        }
+
+        function speak(text) {
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'en-US';
+            u.rate = 0.9;
+            window.speechSynthesis.speak(u);
+        }
+
+        function renderMindmap() {
+            const container = document.getElementById('mm-container');
+            const svg = document.getElementById('mm-svg');
+            const vocab = state.currentTopic.vocab.slice(0, 8);
+            
+            svg.innerHTML = '';
+            container.innerHTML = '';
+
+            const core = document.createElement('div');
+            core.className = "w-32 h-32 bg-indigo-600 rounded-full flex items-center justify-center text-center font-bungee text-white p-4 border-4 border-white/20 z-20 shadow-2xl animate-pulse";
+            core.innerText = state.currentTopic.title;
+            container.appendChild(core);
+
+            vocab.forEach((v, i) => {
+                const angle = (i / vocab.length) * Math.PI * 2;
+                const dist = 180;
+                const x = Math.cos(angle) * dist;
+                const y = Math.sin(angle) * dist;
+
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", "50%");
+                line.setAttribute("y1", "50%");
+                line.setAttribute("x2", `calc(50% + ${x}px)`);
+                line.setAttribute("y2", `calc(50% + ${y}px)`);
+                line.setAttribute("class", "mindmap-branch");
+                svg.appendChild(line);
+
+                const child = document.createElement('div');
+                child.className = "absolute w-20 h-20 glass rounded-2xl flex flex-col items-center justify-center border-2 border-indigo-500/50 shadow-lg hover:scale-110 transition-all cursor-pointer group";
+                child.style.transform = `translate(${x}px, ${y}px)`;
+                child.innerHTML = `<span class="text-2xl">${v.img}</span><span class="text-[8px] font-black uppercase text-center mt-1">${v.t}</span>`;
+                child.onclick = () => speak(v.t);
+                container.appendChild(child);
+            });
+        }
+
+        function startQuiz() {
+            state.quizIndex = 0;
+            renderQuizStep();
+        }
+
+        function renderQuizStep() {
+            const quiz = state.currentTopic.quiz[state.quizIndex];
+            if(!quiz) {
+                finishQuiz();
+                return;
+            }
+
+            document.getElementById('quiz-counter').innerText = `Question ${state.quizIndex + 1}/${state.currentTopic.quiz.length}`;
+            const body = document.getElementById('quiz-body');
+            body.className = "animate-slide";
+            
+            let html = `<p class="text-2xl font-bold mb-8 text-white">${quiz.q}</p>`;
+
+            if(quiz.type === 'listen') {
+                html = `
+                    <div class="flex flex-col items-center">
+                        <button onclick="speak('${quiz.audio}')" class="w-20 h-20 bg-indigo-600 rounded-full text-3xl mb-8 hover:scale-110 shadow-lg">🔊</button>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
+                            ${quiz.o.map(opt => `<button onclick="checkQuiz('${opt}', '${quiz.a}')" class="p-6 rounded-2xl bg-slate-800 hover:bg-indigo-600 font-bold transition-all border border-white/5">${opt}</button>`).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if(quiz.type === 'choice' || quiz.type === 'read') {
+                html += `
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        ${quiz.o.map(opt => `<button onclick="checkQuiz('${opt}', '${quiz.a}')" class="p-6 rounded-2xl bg-slate-800 hover:bg-indigo-600 font-bold transition-all text-left border border-white/5">${opt}</button>`).join('')}
+                    </div>
+                `;
+            } else if(quiz.type === 'write') {
+                html += `
+                    <div class="space-y-4">
+                        <input type="text" id="quiz-input" placeholder="Nhập câu trả lời..." class="w-full p-6 rounded-2xl bg-slate-800 border-2 border-white/5 outline-none focus:border-indigo-500 font-bold">
+                        <p class="text-xs text-slate-500 italic">Gợi ý: ${quiz.hint}</p>
+                        <button onclick="checkQuiz(document.getElementById('quiz-input').value, '${quiz.a}')" class="w-full p-5 bg-indigo-600 rounded-2xl font-bungee">KIỂM TRA</button>
+                    </div>
+                `;
+            }
+
+            body.innerHTML = html;
+        }
+
+        function checkQuiz(val, ans) {
+            const isCorrect = val.trim().toLowerCase() === ans.toLowerCase();
+            if(isCorrect) {
+                confetti({ particleCount: 30, spread: 60 });
+                state.score += 100;
+                updateScoreUI();
+                state.quizIndex++;
+                setTimeout(renderQuizStep, 500);
+            } else {
+                const body = document.getElementById('quiz-body');
+                body.classList.add('shake');
+                setTimeout(() => body.classList.remove('shake'), 500);
+            }
+        }
+
+        function finishQuiz() {
+            document.getElementById('quiz-body').innerHTML = `
+                <div class="text-center py-10">
+                    <div class="text-6xl mb-6">🏆</div>
+                    <h3 class="text-3xl font-bungee text-yellow-400 mb-2">QUÁ TUYỆT VỜI!</h3>
+                    <p class="text-slate-400 mb-8">Bạn đã hoàn thành bài luyện tập xuất sắc.</p>
+                    <button onclick="switchTab('learn')" class="bg-indigo-600 px-10 py-4 rounded-2xl font-bungee">TIẾP TỤC HỌC</button>
+                </div>
+            `;
+            updateProgress(20);
+        }
+
+        let gameData = { combo: 0 };
+        function initGameArena() {
+            const vocab = state.currentTopic.vocab;
+            const target = vocab[Math.floor(Math.random() * vocab.length)];
+            
+            document.getElementById('g-ball').className = "text-7xl mb-12 ball-glow transition-all duration-500";
+            document.getElementById('g-q-text').innerText = `Shoot into: "${target.m}"`;
+            
+            let timeLeft = 15;
+            document.getElementById('game-timer-ring').innerText = timeLeft;
+            clearInterval(state.gameTimer);
+            state.gameTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('game-timer-ring').innerText = timeLeft;
+                if(timeLeft <= 0) {
+                    gameData.combo = 0;
+                    document.getElementById('game-combo').innerText = 0;
+                    initGameArena();
+                }
+            }, 1000);
+
+            const shuffle = [...vocab].sort(() => 0.5 - Math.random()).slice(0, 4);
+            if(!shuffle.find(s => s.t === target.t)) shuffle[0] = target;
+            shuffle.sort(() => 0.5 - Math.random());
+
+            const opts = document.getElementById('g-options');
+            opts.innerHTML = shuffle.map(o => `
+                <button onclick="handleGameHit('${o.t}', '${target.t}')" class="bg-slate-800 p-6 rounded-3xl font-bungee text-lg hover:bg-indigo-600 border-b-4 border-black/40 active:translate-y-1 transition-all">
+                    ${o.t}
+                </button>
+            `).join('');
+        }
+
+        function handleGameHit(val, ans) {
+            if(val === ans) {
+                gameData.combo++;
+                document.getElementById('game-combo').innerText = gameData.combo;
+                const ball = document.getElementById('g-ball');
+                ball.style.transform = "translateY(-200px) scale(0) rotate(360deg)";
+                ball.style.opacity = "0";
+                
+                state.score += (20 * gameData.combo);
+                updateScoreUI();
+                confetti({ colors: ['#6366f1', '#fbbf24'] });
+                
+                clearInterval(state.gameTimer);
+                setTimeout(initGameArena, 600);
+            } else {
+                gameData.combo = 0;
+                document.getElementById('game-combo').innerText = 0;
+            }
+        }
+
+        function updateScoreUI() {
+            document.getElementById('score-val').innerText = state.score;
+            localStorage.setItem('ems_score', state.score);
+            localStorage.setItem('ems_prog', JSON.stringify(state.progress));
+        }
+
+        function updateProgress(amt) {
+            const tid = state.currentTopic.id;
+            state.progress[tid] = Math.min(100, (state.progress[tid] || 0) + amt);
+            updateTopicProgress();
+            renderTopics();
+            updateScoreUI();
+        }
+
+        function updateTopicProgress() {
+            const p = state.progress[state.currentTopic.id] || 0;
+            document.getElementById('topic-progress').style.width = p + "%";
+            document.getElementById('progress-percent').innerText = p + "%";
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>

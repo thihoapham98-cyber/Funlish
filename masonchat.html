@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mason AI - English Grade 5 Gemini Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --neon-blue: #0ea5e9;
+            --neon-purple: #8b5cf6;
+            --bg-dark: #020617;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: #f1f5f9;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .glass {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .app-container {
+            display: flex;
+            height: calc(100vh - 80px);
+            gap: 1.25rem;
+            padding: 1.25rem;
+            box-sizing: border-box;
+        }
+
+        .mode-sidebar {
+            width: 76px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+            padding: 1.25rem 0;
+        }
+
+        .mode-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .mode-btn.active {
+            background: var(--neon-blue);
+            color: white;
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+        }
+
+        .quiz-opt {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 1rem;
+            border-radius: 14px;
+            text-align: left;
+            transition: 0.3s;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+        }
+
+        .quiz-opt:hover:not(:disabled) {
+            background: rgba(14, 165, 233, 0.1);
+            border-color: var(--neon-blue);
+        }
+
+        .typing-dot {
+            width: 5px; height: 5px; background: #cbd5e1; border-radius: 50%; animation: bounce 1.2s infinite;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
+
+        .no-scrollbar::-webkit-scrollbar { width: 4px; }
+        .no-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .mason-core {
+            width: 100%; height: 100%; border-radius: 50%;
+            background: url('https://energizelab.com/upfile/image/20250919/1758273806_872414.jpg') center/cover;
+            border: 2px solid var(--neon-blue);
+        }
+        .talking { animation: speak 0.6s infinite alternate; }
+        @keyframes speak { from { transform: scale(1); } to { transform: scale(1.1); } }
+
+        .sparkle-btn {
+            background: linear-gradient(45deg, #0ea5e9, #8b5cf6);
+            border: none;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .sparkle-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .unit-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .unit-card:hover {
+            transform: translateY(-5px);
+            background: rgba(14, 165, 233, 0.1);
+            border-color: var(--neon-blue);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="fixed inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(17,24,39,1),rgba(2,6,23,1))] -z-10"></div>
+
+    <header class="h-20 flex items-center justify-between px-8 glass border-b border-white/5 relative z-10">
+        <div class="flex items-center gap-4">
+            <div class="p-2.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl">
+                <i class="fas fa-brain-circuit text-white text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight">MASON <span class="text-sky-400">GEMINI AI</span></h1>
+                <p class="text-[9px] text-slate-500 font-extrabold uppercase tracking-[0.2em]" id="txt-subtitle">Hệ thống học tập hội thoại thông minh</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleLang()" class="glass px-3 py-1.5 rounded-lg text-[10px] font-bold border-white/10 hover:bg-white/5 flex items-center gap-2">
+                <i class="fas fa-globe text-sky-400"></i> <span id="btn-lang-text">Tiếng Việt</span>
+            </button>
+            <button onclick="askForRoadmap()" class="sparkle-btn text-[10px] px-4 py-2 rounded-full text-white font-bold flex items-center gap-2">
+                ✨ <span id="btn-roadmap">Tư vấn lộ trình</span>
+            </button>
+            <div class="flex flex-col items-end">
+                <span class="text-[9px] text-slate-500 font-bold uppercase" id="txt-points">Điểm tích lũy</span>
+                <span class="text-sm font-black text-sky-400" id="ui-points">2,450 XP</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="app-container">
+        <nav class="mode-sidebar glass rounded-[32px]">
+            <div onclick="setMode('home')" class="mode-btn active" id="btn-home" title="Trang chủ"><i class="fas fa-house"></i></div>
+            <div onclick="setMode('theory')" class="mode-btn" id="btn-theory" title="Lý thuyết"><i class="fas fa-book"></i></div>
+            <div onclick="setMode('exercise')" class="mode-btn" id="btn-exercise" title="Thử thách"><i class="fas fa-trophy"></i></div>
+            <div onclick="setMode('practice')" class="mode-btn" id="btn-practice" title="Luyện hội thoại"><i class="fas fa-comments"></i></div>
+            <div onclick="setMode('review')" class="mode-btn" id="btn-review" title="Củng cố kiến thức"><i class="fas fa-dumbbell"></i></div>
+        </nav>
+
+        <div class="flex-[2.5] flex flex-col gap-5">
+            <div id="stage-container" class="flex-1 glass rounded-[40px] p-8 overflow-y-auto no-scrollbar border border-white/5">
+                <div id="stage-content" class="fade-in h-full"></div>
+            </div>
+            <div class="grid grid-cols-4 gap-4 h-20">
+                <div class="glass p-4 rounded-2xl flex flex-col justify-center">
+                    <p class="text-[8px] font-black text-slate-500 uppercase" id="txt-streak">Đúng liên tiếp</p>
+                    <p class="text-lg font-black text-orange-400" id="streak-val">0 🔥</p>
+                </div>
+                <div class="glass p-4 rounded-2xl flex flex-col justify-center">
+                    <p class="text-[8px] font-black text-slate-500 uppercase" id="txt-unit">Unit hiện tại</p>
+                    <p class="text-lg font-black" id="current-unit-val">1</p>
+                </div>
+                <div class="glass p-4 rounded-2xl flex flex-col justify-center">
+                    <p class="text-[8px] font-black text-slate-500 uppercase" id="txt-ai-status">Trạng thái AI</p>
+                    <p class="text-xs font-bold text-emerald-400" id="ai-status">Sẵn sàng ✨</p>
+                </div>
+                <div class="glass p-4 rounded-2xl flex flex-col justify-center">
+                    <p class="text-[8px] font-black text-slate-500 uppercase" id="txt-rank">Cấp độ</p>
+                    <p class="text-lg font-black text-sky-400">Bronze II</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 flex flex-col gap-4 min-w-[380px]">
+            <div class="glass rounded-[32px] p-6 flex items-center gap-5 border border-white/5">
+                <div class="relative w-16 h-16 flex-shrink-0">
+                    <div id="mason-avatar" class="mason-core shadow-[0_0_15px_rgba(14,165,233,0.3)]"></div>
+                    <div class="absolute bottom-0 right-0 w-4 h-4 bg-emerald-500 border-2 border-[#020617] rounded-full"></div>
+                </div>
+                <div>
+                    <h3 class="font-black text-sm mb-1 uppercase">Mason AI ✨</h3>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Powered by Gemini</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1 glass rounded-[32px] flex flex-col overflow-hidden border border-white/5">
+                <div id="chat-display" class="flex-1 overflow-y-auto p-5 space-y-4 no-scrollbar"></div>
+                <div id="typing-ui" class="hidden px-5 py-2">
+                    <div class="bg-slate-800/50 p-3 rounded-2xl inline-flex gap-1.5 items-center border border-white/5">
+                        <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+                    </div>
+                </div>
+                <div class="p-4 bg-white/5 border-t border-white/10">
+                    <div class="flex items-center gap-2 bg-slate-900/80 p-2 rounded-xl border border-white/5">
+                        <input id="user-input" type="text" placeholder="Hỏi Mason về tiếng Anh..." class="flex-1 bg-transparent border-none outline-none px-3 text-xs text-white">
+                        <button onclick="handleSend()" class="w-10 h-10 sparkle-btn rounded-lg flex items-center justify-center hover:opacity-90 transition-all">
+                            <i class="fas fa-paper-plane text-xs text-white"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = ""; 
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'mason-english-gemini';
+
+        let points = 2450;
+        let currentUnit = 1;
+        let qIndex = 0;
+        let mode = 'home';
+        let streak = 0;
+        let isTyping = false;
+        let lang = 'vi'; 
+
+        const TRANSLATIONS = {
+            vi: {
+                subtitle: "Hệ thống học tập hội thoại thông minh",
+                roadmap: "Tư vấn lộ trình",
+                points: "Điểm tích lũy",
+                streak: "Đúng liên tiếp",
+                unit: "Unit hiện tại",
+                aiStatus: "Trạng thái AI",
+                ready: "Sẵn sàng ✨",
+                thinking: "Đang suy nghĩ... ✨",
+                placeholder: "Hỏi Mason về tiếng Anh...",
+                homeTitle: "Chào mừng đến với kỷ nguyên AI!",
+                homeSub: "Mason hiện đã được tích hợp Gemini AI để giúp bạn học tập thông minh và cá nhân hóa hơn.",
+                explore: "KHÁM PHÁ NGAY",
+                theoryTitle: "Thư viện lý thuyết",
+                theorySub: "Chọn một Unit để xem tóm tắt thông minh từ AI.",
+                reviewTitle: "Củng cố kiến thức",
+                reviewSub: "Mason sẽ tạo bài tập dựa trên những phần bạn còn yếu hoặc chưa nắm vững.",
+                reviewBtn: "BẮT ĐẦU ÔN TẬP ✨",
+                practiceTitle: "Luyện nói cùng Mason ✨",
+                practiceSub: "Hãy chọn chủ đề luyện tập hội thoại."
+            },
+            en: {
+                subtitle: "Smart Conversational Learning System",
+                roadmap: "Learning Path",
+                points: "Experience Points",
+                streak: "Current Streak",
+                unit: "Current Unit",
+                aiStatus: "AI Status",
+                ready: "Ready ✨",
+                thinking: "Thinking... ✨",
+                placeholder: "Ask Mason anything...",
+                homeTitle: "Welcome to the AI Era!",
+                homeSub: "Mason is now integrated with Gemini AI for smart and personalized learning.",
+                explore: "EXPLORE NOW",
+                theoryTitle: "Theory Library",
+                theorySub: "Select a Unit for an AI summary.",
+                reviewTitle: "Skill Mastery",
+                reviewSub: "Mason generates exercises based on your needs.",
+                reviewBtn: "START REVIEW ✨",
+                practiceTitle: "Speak with Mason ✨",
+                practiceSub: "Choose a topic to practice conversation."
+            }
+        };
+
+        // Improved API Call with correct Model and Error Handling
+        async function callGemini(prompt, systemInstruction = "", retries = 5) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const sys = systemInstruction || `Bạn là Mason AI. Hãy thân thiện với trẻ em lớp 5. Ngôn ngữ: ${lang === 'vi' ? 'Tiếng Việt' : 'Tiếng Anh'}.`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: sys }] }
+            };
+
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!response.ok) throw new Error('API request failed');
+                    
+                    const result = await response.json();
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) return text;
+                    throw new Error('Empty response');
+                } catch (error) {
+                    if (i === retries - 1) return "Lỗi kết nối. Vui lòng thử lại sau.";
+                    await new Promise(r => setTimeout(r, 1000 * Math.pow(2, i)));
+                }
+            }
+        }
+
+        function toggleLang() {
+            lang = lang === 'vi' ? 'en' : 'vi';
+            document.getElementById('btn-lang-text').innerText = lang === 'vi' ? 'Tiếng Việt' : 'English';
+            updateUIStrings();
+            render();
+        }
+
+        function updateUIStrings() {
+            const t = TRANSLATIONS[lang];
+            document.getElementById('txt-subtitle').innerText = t.subtitle;
+            document.getElementById('btn-roadmap').innerText = t.roadmap;
+            document.getElementById('txt-points').innerText = t.points;
+            document.getElementById('txt-streak').innerText = t.streak;
+            document.getElementById('txt-unit').innerText = t.unit;
+            document.getElementById('txt-ai-status').innerText = t.aiStatus;
+            document.getElementById('ai-status').innerText = t.ready;
+            document.getElementById('user-input').placeholder = t.placeholder;
+        }
+
+        function setMode(m) {
+            mode = m;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${m}`).classList.add('active');
+            render();
+        }
+
+        async function render() {
+            const content = document.getElementById('stage-content');
+            const t = TRANSLATIONS[lang];
+            content.innerHTML = ""; 
+
+            if (mode === 'home') {
+                content.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-center fade-in">
+                        <div class="w-24 h-24 bg-sky-500/10 rounded-3xl flex items-center justify-center mb-6 border border-sky-500/20">
+                            <i class="fas fa-sparkles text-4xl text-sky-400"></i>
+                        </div>
+                        <h2 class="text-4xl font-black mb-4">${t.homeTitle}</h2>
+                        <p class="text-slate-400 mb-10 max-w-md">${t.homeSub}</p>
+                        <button onclick="setMode('exercise')" class="sparkle-btn px-10 py-4 rounded-2xl font-black text-white">${t.explore}</button>
+                    </div>`;
+            } else if (mode === 'theory') {
+                renderTheoryLibrary();
+            } else if (mode === 'exercise') {
+                renderChallenge();
+            } else if (mode === 'practice') {
+                content.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-center fade-in">
+                        <h2 class="text-3xl font-black mb-4">${t.practiceTitle}</h2>
+                        <p class="text-slate-400 mb-8 max-w-sm">${t.practiceSub}</p>
+                        <div class="grid grid-cols-2 gap-3 w-full max-w-md">
+                            <button onclick="quickTalk('Hobbies')" class="glass p-4 rounded-xl text-xs hover:border-sky-500 transition-all text-white">My Hobbies ✨</button>
+                            <button onclick="quickTalk('My School')" class="glass p-4 rounded-xl text-xs hover:border-sky-500 transition-all text-white">My School ✨</button>
+                        </div>
+                    </div>`;
+            } else if (mode === 'review') {
+                renderReview();
+            }
+        }
+
+        function renderTheoryLibrary() {
+            const content = document.getElementById('stage-content');
+            const t = TRANSLATIONS[lang];
+            const units = [
+                { id: 1, title: lang === 'vi' ? "Địa chỉ của bạn ở đâu?" : "What's your address?" },
+                { id: 2, title: lang === 'vi' ? "Thói quen hàng ngày" : "I always get up early" },
+                { id: 3, title: lang === 'vi' ? "Về chuyến đi đã qua" : "Where did you go on holiday?" },
+                { id: 4, title: lang === 'vi' ? "Tiệc sinh nhật" : "Did you go to the party?" }
+            ];
+
+            content.innerHTML = `
+                <div class="fade-in h-full">
+                    <h2 class="text-3xl font-black mb-2">${t.theoryTitle}</h2>
+                    <p class="text-slate-400 mb-8">${t.theorySub}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${units.map(u => `
+                            <div onclick="loadTheoryDetail(${u.id}, '${u.title}')" class="unit-card glass p-6 rounded-[24px]">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="w-12 h-12 bg-sky-500/20 rounded-xl flex items-center justify-center">
+                                        <span class="text-sky-400 font-black">U${u.id}</span>
+                                    </div>
+                                    <i class="fas fa-chevron-right text-slate-600"></i>
+                                </div>
+                                <h3 class="font-bold text-lg mb-1">${u.title}</h3>
+                                <p class="text-[10px] text-slate-500 uppercase font-black">Grade 5 • English</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+        }
+
+        async function loadTheoryDetail(id, title) {
+            const content = document.getElementById('stage-content');
+            content.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full text-center fade-in">
+                    <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-circle-notch fa-spin text-2xl text-blue-400"></i>
+                    </div>
+                    <h2 class="text-2xl font-black mb-2">${lang === 'vi' ? 'AI đang tóm tắt lý thuyết...' : 'AI is summarizing theory...'}</h2>
+                </div>`;
+            
+            const prompt = `Hãy viết một bài tóm tắt kiến thức Unit ${id}: ${title} cho học sinh lớp 5. Cấu trúc gồm: 1. Từ vựng. 2. Ngữ pháp. 3. Ví dụ. Sử dụng Markdown.`;
+            const summary = await callGemini(prompt);
+            
+            content.innerHTML = `
+                <div class="fade-in max-w-2xl mx-auto pb-10">
+                    <button onclick="renderTheoryLibrary()" class="flex items-center gap-2 text-slate-500 mb-6 hover:text-white transition-all text-sm">
+                        <i class="fas fa-arrow-left"></i> Quay lại
+                    </button>
+                    <div class="glass p-8 rounded-[32px] border-white/5 space-y-6 text-slate-300 leading-relaxed text-sm overflow-y-auto max-h-[70vh] no-scrollbar">
+                        <h2 class="text-2xl font-black text-sky-400 uppercase">Unit ${id}: ${title}</h2>
+                        <div class="prose prose-invert max-w-none whitespace-pre-wrap">
+                            ${summary}
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function renderReview() {
+            const content = document.getElementById('stage-content');
+            const t = TRANSLATIONS[lang];
+            content.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full text-center fade-in">
+                    <div class="w-24 h-24 bg-purple-500/20 rounded-[32px] flex items-center justify-center mb-6">
+                        <i class="fas fa-dumbbell text-4xl text-purple-400"></i>
+                    </div>
+                    <h2 class="text-3xl font-black mb-4">${t.reviewTitle}</h2>
+                    <p class="text-slate-400 mb-8 max-w-md">${t.reviewSub}</p>
+                    <button onclick="startAiReview()" class="sparkle-btn px-10 py-4 rounded-2xl font-black text-white">${t.reviewBtn}</button>
+                </div>`;
+        }
+
+        async function startAiReview() {
+            const content = document.getElementById('stage-content');
+            content.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full text-center fade-in">
+                    <div class="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-magic fa-spin text-2xl text-purple-400"></i>
+                    </div>
+                    <h2 class="text-2xl font-black mb-2">${lang === 'vi' ? 'AI đang tạo bài tập...' : 'AI generating quiz...'}</h2>
+                </div>`;
+
+            const prompt = `Tạo 3 câu hỏi trắc nghiệm tiếng Anh lớp 5 về Unit ${currentUnit}. Phản hồi CHỈ gồm JSON mảng: [{"q": "câu hỏi", "opts": ["A", "B", "C"], "ans": index_đúng}]. Không kèm chữ khác.`;
+            const raw = await callGemini(prompt, "Bạn là máy tạo JSON. Không bao giờ trả về văn bản thường.");
+            
+            try {
+                // Handle markdown code blocks if any
+                const cleanJson = raw.replace(/```json|```/g, "").trim();
+                const questions = JSON.parse(cleanJson);
+                renderAiQuiz(questions);
+            } catch (e) {
+                addMasonMsg("Lỗi định dạng dữ liệu từ AI. Đang thử lại...");
+                renderReview();
+            }
+        }
+
+        function renderAiQuiz(questions) {
+            const content = document.getElementById('stage-content');
+            const displayQ = (idx) => {
+                const q = questions[idx];
+                content.innerHTML = `
+                    <div class="fade-in max-w-xl mx-auto py-10">
+                        <span class="text-[10px] font-black text-purple-400 uppercase tracking-widest">AI Challenge ${idx+1}/${questions.length}</span>
+                        <p class="text-2xl font-black my-8">${q.q}</p>
+                        <div class="space-y-3">
+                            ${q.opts.map((o, i) => `
+                                <button onclick="checkAiAns(${i}, ${q.ans}, ${idx})" class="quiz-opt">
+                                    <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-[10px] font-black text-white">${String.fromCharCode(65+i)}</span>
+                                    <span class="text-sm font-semibold">${o}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>`;
+            };
+
+            window.checkAiAns = (userIdx, correctIdx, qIdx) => {
+                if (userIdx === correctIdx) {
+                    confetti();
+                    if (qIdx < questions.length - 1) displayQ(qIdx + 1);
+                    else {
+                        addMasonMsg("Hoàn thành bài tập! +200 XP");
+                        points += 200; updateStats();
+                        render();
+                    }
+                } else {
+                    addMasonMsg("Gần đúng rồi! Hãy chọn lại nhé.");
+                }
+            };
+            displayQ(0);
+        }
+
+        const QUESTIONS = {
+            1: [
+                { type: 'select', q: "What's your address?", opts: ["It's 81, Tran Hung Dao Street.", "I am ten years old.", "I like pizza."], ans: 0 },
+                { type: 'fill', q: "Where ____ you live?", ans: "do" }
+            ],
+            2: [
+                { type: 'select', q: "I ____ get up early in the morning.", opts: ["always", "neverly", "twice"], ans: 0 },
+                { type: 'fill', q: "How ____ do you brush your teeth?", ans: "often" }
+            ]
+        };
+
+        function renderChallenge() {
+            const content = document.getElementById('stage-content');
+            const unitQuestions = QUESTIONS[currentUnit] || QUESTIONS[1];
+            const question = unitQuestions[qIndex % unitQuestions.length];
+            
+            let quizHtml = '';
+            if (question.type === 'select') {
+                quizHtml = `<div class="space-y-3 mt-6">
+                    ${question.opts.map((o, i) => `
+                        <button onclick="checkAnswer(${i})" class="quiz-opt">
+                            <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-[10px] font-black">${String.fromCharCode(65+i)}</span>
+                            <span class="text-sm font-semibold">${o}</span>
+                        </button>
+                    `).join('')}
+                </div>`;
+            } else {
+                quizHtml = `<div class="mt-8">
+                    <input type="text" id="ans-input" placeholder="Nhập đáp án..." class="w-full bg-slate-900 border border-white/10 p-4 rounded-xl outline-none focus:border-sky-500 text-sm text-white">
+                    <button onclick="checkAnswer(document.getElementById('ans-input').value)" class="w-full mt-4 bg-sky-600 py-3 rounded-xl font-bold text-sm text-white">XÁC NHẬN ✨</button>
+                </div>`;
+            }
+
+            content.innerHTML = `
+                <div class="fade-in max-w-xl mx-auto h-full flex flex-col justify-center">
+                    <span class="text-[10px] font-black text-sky-400 uppercase tracking-widest">Unit ${currentUnit}</span>
+                    <p class="text-2xl font-black text-center leading-tight my-8">${question.q}</p>
+                    ${quizHtml}
+                </div>`;
+        }
+
+        async function checkAnswer(userAns) {
+            const unitQuestions = QUESTIONS[currentUnit] || QUESTIONS[1];
+            const question = unitQuestions[qIndex % unitQuestions.length];
+            let isCorrect = (question.type === 'select') ? (userAns === question.ans) : (userAns.toLowerCase().trim() === question.ans.toLowerCase());
+
+            if (isCorrect) {
+                points += 100; streak++; updateStats();
+                confetti();
+                addMasonMsg("✨ Tuyệt vời! Bạn giỏi quá.");
+                qIndex++;
+                if (qIndex >= unitQuestions.length) showSuccessScreen();
+                else setTimeout(renderChallenge, 1500);
+            } else {
+                streak = 0; updateStats();
+                toggleTyping(true);
+                const hint = await callGemini(`Học sinh sai câu "${question.q}". Hãy cho 1 gợi ý ngắn.`);
+                toggleTyping(false);
+                addMasonMsg(hint);
+            }
+        }
+
+        function showSuccessScreen() {
+            const content = document.getElementById('stage-content');
+            content.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full text-center fade-in">
+                    <h2 class="text-3xl font-black mb-2 text-emerald-400">Unit Complete!</h2>
+                    <button onclick="nextUnit()" class="sparkle-btn px-10 py-4 rounded-2xl font-black text-white mt-8">CONTINUE</button>
+                </div>`;
+        }
+
+        async function askForRoadmap() {
+            if(isTyping) return;
+            toggleTyping(true);
+            const roadmap = await callGemini(`Tư vấn lộ trình học Unit ${currentUnit} cho học sinh lớp 5.`);
+            toggleTyping(false);
+            addMasonMsg(roadmap);
+        }
+
+        async function quickTalk(topic) {
+            if(isTyping) return;
+            toggleTyping(true);
+            const msg = await callGemini(`Bắt đầu hội thoại ngắn về "${topic}" với học sinh lớp 5.`);
+            toggleTyping(false);
+            addMasonMsg(msg);
+        }
+
+        function nextUnit() {
+            currentUnit = currentUnit === 4 ? 1 : currentUnit + 1;
+            qIndex = 0; render(); updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('ui-points').innerText = `${points.toLocaleString()} XP`;
+            document.getElementById('streak-val').innerText = `${streak} 🔥`;
+            document.getElementById('current-unit-val').innerText = currentUnit;
+        }
+
+        async function handleSend() {
+            const input = document.getElementById('user-input');
+            const val = input.value.trim();
+            if(!val || isTyping) return;
+            addUserMsg(val); input.value = '';
+            toggleTyping(true);
+            const response = await callGemini(val);
+            toggleTyping(false);
+            addMasonMsg(response);
+        }
+
+        function toggleTyping(show) {
+            isTyping = show;
+            document.getElementById('typing-ui').classList.toggle('hidden', !show);
+            document.getElementById('ai-status').innerText = show ? TRANSLATIONS[lang].thinking : TRANSLATIONS[lang].ready;
+            document.getElementById('mason-avatar').classList.toggle('talking', show);
+        }
+
+        function addUserMsg(text) {
+            const chat = document.getElementById('chat-display');
+            const div = document.createElement('div');
+            div.className = "flex flex-col items-end fade-in";
+            div.innerHTML = `<div class="bg-sky-600 p-3 rounded-2xl rounded-tr-none text-[11px] text-white font-semibold max-w-[85%]">${text}</div>`;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function addMasonMsg(text) {
+            const chat = document.getElementById('chat-display');
+            const div = document.createElement('div');
+            div.className = "flex flex-col items-start fade-in";
+            const formatted = text.replace(/\*\*(.*?)\*\*/g, '<b class="text-sky-400">$1</b>').replace(/\n/g, '<br>');
+            div.innerHTML = `<div class="bg-slate-800/80 p-3 rounded-2xl rounded-tl-none text-[11px] text-white border border-white/5 max-w-[85%]">${formatted}</div>`;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        window.onload = () => {
+            updateUIStrings();
+            render();
+            addMasonMsg(lang === 'vi' ? "Chào bạn! Mason AI đã sẵn sàng." : "Hello! Mason AI is ready.");
+        };
+    </script>
+</body>
+</html>

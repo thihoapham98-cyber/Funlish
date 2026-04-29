@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Elite Academy | Hệ thống Kho Học Liệu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .premium-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .premium-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.1);
+            border-color: #6366f1;
+        }
+
+        .category-filter {
+            transition: all 0.2s ease;
+        }
+
+        .category-filter.active {
+            background-color: #6366f1;
+            color: white;
+            border-color: #6366f1;
+            transform: scale(1.05);
+        }
+
+        /* Type Colors */
+        .color-ref { background-color: #f1f5f9; color: #475569; border-color: #e2e8f0; }
+        .color-video { background-color: #eff6ff; color: #2563eb; border-color: #dbeafe; }
+        .color-mindmap { background-color: #ecfdf5; color: #059669; border-color: #d1fae5; }
+        .color-flashcard { background-color: #fff7ed; color: #ea580c; border-color: #ffedd5; }
+        .color-game { background-color: #f5f3ff; color: #7c3aed; border-color: #ede9fe; }
+        .color-audio { background-color: #fff1f2; color: #e11d48; border-color: #ffe4e6; }
+
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+
+    <!-- Header & Navigation -->
+    <header class="glass-header sticky top-0 z-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight text-slate-900 leading-none">E-Elite Academy</h1>
+                    <p class="text-[10px] uppercase font-black tracking-widest text-indigo-500 mt-1">Resource Hub</p>
+                </div>
+            </div>
+
+            <div class="hidden md:flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 w-96">
+                <i class="fas fa-search text-slate-400 ml-3"></i>
+                <input type="text" id="searchInput" placeholder="Tìm tên tài liệu, chủ đề..." class="bg-transparent border-none outline-none text-xs font-bold w-full px-2 py-1 text-slate-700">
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button class="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 relative">
+                    <i class="fas fa-bell"></i>
+                    <span class="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
+                </button>
+                <div class="flex items-center gap-3 pl-4 border-l border-slate-200">
+                    <div class="text-right">
+                        <p class="text-[11px] font-black text-slate-900 leading-none">Teacher Admin</p>
+                        <p class="text-[9px] font-bold text-slate-400 mt-1">Quản lý Kho</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 border-2 border-white shadow-sm flex items-center justify-center overflow-hidden">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" alt="avatar">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 pt-10">
+        <!-- Dashboard Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-10">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500"><i class="fas fa-database text-xs"></i></div>
+                <div><p class="text-[10px] font-bold text-slate-400 uppercase">Tổng số</p><p class="text-sm font-black text-slate-900" id="totalCount">0</p></div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600"><i class="fas fa-download text-xs"></i></div>
+                <div><p class="text-[10px] font-bold text-slate-400 uppercase">Tải về</p><p class="text-sm font-black text-slate-900">1.2k+</p></div>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="mb-10 overflow-x-auto pb-4 scrollbar-hide">
+            <div class="flex items-center gap-3" id="filterContainer">
+                <button onclick="filterResources('all')" class="category-filter active px-6 py-3 rounded-2xl border border-slate-200 text-xs font-black uppercase tracking-widest whitespace-nowrap shadow-sm">
+                    Tất cả học liệu
+                </button>
+                <button onclick="filterResources('reference')" class="category-filter px-6 py-3 rounded-2xl border border-slate-200 text-xs font-black uppercase tracking-widest whitespace-nowrap bg-white text-slate-600 hover:bg-slate-50">
+                    <i class="fas fa-file-alt mr-2"></i> Tài liệu tham khảo
+                </button>
+                <button onclick="filterResources('video')" class="category-filter px-6 py-3 rounded-2xl border border-slate-200 text-xs font-black uppercase tracking-widest whitespace-nowrap bg-white text-slate-600 hover:bg-slate-50">
+                    <i class="fas fa-play-circle mr-2"></i> Video học liệu
+                </button>
+                <button onclick="filterResources('mindmap')" class="category-filter px-6 py-3 rounded-2xl border border-slate-200 text-xs font-black uppercase tracking-widest whitespace-nowrap bg-white text-slate-600 hover:bg-slate-50">
+                    <i class="fas fa-project-diagram mr-2"></i> Mindmap tư duy
+                </button>
+                <button onclick="filterResources('flashcard')" class="category-filter px-6 py-3 rounded-2xl border border-slate-200 text-xs font-black uppercase tracking-widest whitespace-nowrap bg-white text-slate-600 hover:bg-slate-50">
+                    <i class="fas fa-layer-group mr-2"></i> Flashcards
+                </button>
+                <button onclick="filterResources('game')" class="category-filter px-6 py-3 rounded-2xl border border-slate-200 text-xs font-black uppercase tracking-widest whitespace-nowrap bg-white text-slate-600 hover:bg-slate-50">
+                    <i class="fas fa-gamepad mr-2"></i> Game ôn tập
+                </button>
+                <button onclick="filterResources('audio')" class="category-filter px-6 py-3 rounded-2xl border border-slate-200 text-xs font-black uppercase tracking-widest whitespace-nowrap bg-white text-slate-600 hover:bg-slate-50">
+                    <i class="fas fa-headphones mr-2"></i> Luyện nghe
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div id="resourcesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Items injected by JS -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden flex-col items-center justify-center py-20 animate-fade-in">
+            <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center text-slate-300 text-3xl mb-6">
+                <i class="fas fa-search-minus"></i>
+            </div>
+            <h3 class="text-xl font-black text-slate-800">Không tìm thấy học liệu</h3>
+            <p class="text-sm text-slate-400 font-bold mt-2">Hãy thử thay đổi từ khóa tìm kiếm hoặc bộ lọc.</p>
+        </div>
+    </main>
+
+    <!-- Modal Xem chi tiết -->
+    <div id="docModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-6">
+        <div class="bg-white w-full max-w-2xl rounded-[32px] shadow-2xl overflow-hidden animate-fade-in">
+            <div class="p-8 border-b border-slate-100 flex justify-between items-start">
+                <div class="flex gap-4">
+                    <div id="modalIcon" class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl"></div>
+                    <div>
+                        <h3 id="modalTitle" class="text-2xl font-black text-slate-900 tracking-tight"></h3>
+                        <div class="flex gap-2 mt-2">
+                            <span id="modalBadge" class="px-2 py-0.5 rounded text-[10px] font-black uppercase border"></span>
+                            <span id="modalMeta" class="text-[11px] font-bold text-slate-400"></span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-rose-500 hover:text-white transition-all">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-8 bg-slate-50">
+                <div class="bg-white p-12 rounded-3xl border border-slate-200 border-dashed text-center">
+                    <div class="w-16 h-16 bg-indigo-50 text-indigo-500 rounded-full flex items-center justify-center text-xl mx-auto mb-4">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <p class="text-sm font-bold text-slate-500 max-w-xs mx-auto mb-8">Hệ thống đang tải bản xem trước chất lượng cao cho tài liệu này...</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button class="py-4 bg-indigo-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all">
+                            Tải xuống ngay
+                        </button>
+                        <button class="py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-50 transition-all">
+                            Lưu vào kho riêng
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Danh mục dữ liệu Mockup
+        const data = [
+            // Reference
+            { id: 1, category: 'reference', title: 'Đề cương ôn tập Học kỳ 1 - Khối 5', meta: 'PDF • 15 trang', icon: 'file-pdf', class: 'color-ref' },
+            { id: 2, category: 'reference', title: 'Bảng động từ bất quy tắc cơ bản', meta: 'Docx • 2 trang', icon: 'file-word', class: 'color-ref' },
+            { id: 3, category: 'reference', title: 'Phiếu bài tập Unit 5: My Dream Job', meta: 'PDF • 3 trang', icon: 'file-signature', class: 'color-ref' },
+            
+            // Video
+            { id: 4, category: 'video', title: 'Hoạt hình: Daily Routine (English Speaking)', meta: 'MP4 • 05:20', icon: 'video', class: 'color-video' },
+            { id: 5, category: 'video', title: 'Video: Phân biệt mạo từ A, An, The', meta: 'Link YouTube', icon: 'play-circle', class: 'color-video' },
+            { id: 6, category: 'video', title: 'Hội thoại tình huống: At the Market', meta: 'MP4 • 03:45', icon: 'film', class: 'color-video' },
+            
+            // Mindmap
+            { id: 7, category: 'mindmap', title: 'Sơ đồ tư duy: Các thì hiện tại', meta: 'JPG • High-res', icon: 'project-diagram', class: 'color-mindmap' },
+            { id: 8, category: 'mindmap', title: 'Mindmap: Chủ đề Family & Relationships', meta: 'PNG • 2MB', icon: 'sitemap', class: 'color-mindmap' },
+            
+            // Flashcards
+            { id: 9, category: 'flashcard', title: 'Flashcards: Chủ đề School Objects', meta: '25 thẻ • Quizlet', icon: 'clone', class: 'color-flashcard' },
+            { id: 10, category: 'flashcard', title: 'Thẻ từ vựng: Adjectives (Tính từ miêu tả)', meta: '40 thẻ • In được', icon: 'layer-group', class: 'color-flashcard' },
+            
+            // Games
+            { id: 11, category: 'game', title: 'Quizizz: Trắc nghiệm Từ vựng Unit 1-3', meta: 'Interactive Quiz', icon: 'gamepad', class: 'color-game' },
+            { id: 12, category: 'game', title: 'Blooket: Trận chiến ngữ pháp', meta: 'Multiplayer Game', icon: 'puzzle-piece', class: 'color-game' },
+            { id: 13, category: 'game', title: 'Wordwall: Nối từ về Chủ đề Nghề nghiệp', meta: 'Web Link', icon: 'dice-d20', class: 'color-game' },
+            
+            // Audio
+            { id: 14, category: 'audio', title: 'Audio bài nghe Movers Test 1', meta: 'MP3 • 12:00', icon: 'headphones', class: 'color-audio' },
+            { id: 15, category: 'audio', title: 'Bài hát: Hello Song for Kids', meta: 'MP3 • 02:30', icon: 'music', class: 'color-audio' }
+        ];
+
+        const grid = document.getElementById('resourcesGrid');
+        const emptyState = document.getElementById('emptyState');
+        const totalCount = document.getElementById('totalCount');
+
+        function renderItems(items) {
+            totalCount.innerText = items.length;
+            if (items.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            emptyState.classList.remove('flex');
+            
+            grid.innerHTML = items.map(item => `
+                <div onclick="openModal(${item.id})" class="premium-card p-6 flex flex-col group cursor-pointer animate-fade-in">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-12 h-12 rounded-xl ${item.class} border flex items-center justify-center text-xl transition-transform group-hover:scale-110">
+                            <i class="fas fa-${item.icon}"></i>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[9px] font-black px-2 py-0.5 bg-slate-100 rounded text-slate-400 uppercase tracking-widest">${item.category}</span>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-black text-slate-800 text-sm leading-tight mb-2 group-hover:text-indigo-600 transition-colors">${item.title}</h4>
+                        <p class="text-[10px] font-bold text-slate-400 flex items-center gap-1.5"><i class="fas fa-info-circle text-[9px]"></i> ${item.meta}</p>
+                    </div>
+                    <div class="mt-6 flex items-center justify-between pt-4 border-t border-slate-50">
+                        <span class="text-[9px] font-black text-slate-300 uppercase tracking-tighter">ELITE RESOURCE</span>
+                        <div class="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                            <i class="fas fa-arrow-right text-[10px]"></i>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterResources(category) {
+            // Update UI filter state
+            document.querySelectorAll('.category-filter').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            if (category === 'all') {
+                renderItems(data);
+            } else {
+                const filtered = data.filter(d => d.category === category);
+                renderItems(filtered);
+            }
+        }
+
+        // Search logic
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = data.filter(d => d.title.toLowerCase().includes(term) || d.category.toLowerCase().includes(term));
+            renderItems(filtered);
+        });
+
+        // Modal Logic
+        function openModal(id) {
+            const item = data.find(d => d.id === id);
+            const modal = document.getElementById('docModal');
+            
+            document.getElementById('modalTitle').innerText = item.title;
+            document.getElementById('modalMeta').innerText = item.meta;
+            document.getElementById('modalBadge').innerText = item.category;
+            
+            const iconBox = document.getElementById('modalIcon');
+            iconBox.className = `w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${item.class} border-2`;
+            iconBox.innerHTML = `<i class="fas fa-${item.icon}"></i>`;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('docModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('docModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Initial render
+        renderItems(data);
+    </script>
+</body>
+</html>

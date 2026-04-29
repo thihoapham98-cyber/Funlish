@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Elite Academy - English for Grade 5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+        .sidebar-link:hover { background-color: rgba(59, 130, 246, 0.1); color: #2563eb; }
+        .active-link { background-color: rgba(59, 130, 246, 0.1); color: #2563eb; border-right: 4px solid #2563eb; }
+        .notification-dot { position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background-color: #ef4444; border-radius: 50%; border: 2px solid white; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #4f46e5; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside class="w-64 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col hidden md:flex">
+            <div class="p-6 flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                    <i class="fas fa-language text-xl"></i>
+                </div>
+                <span class="font-extrabold text-xl tracking-tight text-indigo-900 italic">E-Elite <span class="text-blue-600">Academy</span></span>
+            </div>
+
+            <nav class="flex-1 px-4 space-y-1 mt-4 overflow-y-auto custom-scrollbar">
+                <button onclick="switchTab('dashboard')" class="sidebar-btn w-full sidebar-link active-link flex items-center gap-3 p-3 rounded-lg transition-all text-left">
+                    <i class="fas fa-th-large"></i>
+                    <span class="font-medium">Trang chủ học tập</span>
+                </button>
+                <a href="khoahoc.html" class="sidebar-link flex items-center gap-3 p-3 rounded-lg transition-all">
+                    <i class="fas fa-book"></i>
+                    <span class="font-medium">Khóa học Tiếng Anh</span>
+                </a>
+                <button onclick="switchTab('docs')" class="sidebar-btn w-full sidebar-link flex items-center gap-3 p-3 rounded-lg transition-all text-left">
+                    <i class="fas fa-folder-open"></i>
+                    <span class="font-medium">Kho tài liệu</span>
+                </button>
+                <button onclick="switchTab('tests')" class="sidebar-btn w-full sidebar-link flex items-center gap-3 p-3 rounded-lg transition-all text-left">
+                    <i class="fas fa-file-signature"></i>
+                    <span class="font-medium">Kho đề kiểm tra</span>
+                </button>
+                <button onclick="switchTab('discussions')" class="sidebar-btn w-full sidebar-link flex items-center gap-3 p-3 rounded-lg transition-all text-left">
+                    <i class="fas fa-comment-dots"></i>
+                    <span class="font-medium">Cộng đồng E-Elite</span>
+                </button>
+                <button onclick="switchTab('leaderboard')" class="sidebar-btn w-full sidebar-link flex items-center gap-3 p-3 rounded-lg transition-all text-left">
+                    <i class="fas fa-trophy"></i>
+                    <span class="font-medium">Bảng xếp hạng</span>
+                </button>
+                
+                <div class="pt-4 pb-2 px-3">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tiện ích trực tuyến</p>
+                </div>
+                
+                <a href="game.html" class="sidebar-link flex items-center gap-3 p-3 rounded-lg transition-all text-purple-600 hover:text-purple-700">
+                    <i class="fas fa-gamepad"></i>
+                    <span class="font-bold">Trò chơi học tập</span>
+                </a>
+                <button onclick="openStudyModal()" class="w-full sidebar-link flex items-center gap-3 p-3 rounded-lg transition-all text-left text-orange-600 hover:text-orange-700">
+                    <i class="fas fa-users-viewfinder"></i>
+                    <span class="font-bold">Phòng tự học Online</span>
+                </button>
+                <button onclick="switchTab('dictionary')" class="sidebar-btn w-full sidebar-link flex items-center gap-3 p-3 rounded-lg transition-all text-left">
+                    <i class="fas fa-dictionary"></i>
+                    <span class="font-medium">Từ điển Anh-Việt</span>
+                </button>
+                <button onclick="switchTab('mason')" class="sidebar-btn w-full sidebar-link flex items-center gap-3 p-3 rounded-lg transition-all text-left text-indigo-600 bg-indigo-50 border border-indigo-100 hover:bg-indigo-100">
+                    <i class="fas fa-robot animate-pulse"></i>
+                    <span class="font-bold italic">Mason AI</span>
+                </button>
+            </nav>
+
+            <div class="p-4 border-t border-slate-100">
+                <div class="bg-indigo-50 rounded-xl p-4 mb-3">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-crown text-amber-500 text-xs"></i>
+                        <p class="text-[10px] text-indigo-600 font-bold uppercase">Tài khoản Pro</p>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-700">English Star Lớp 5</p>
+                </div>
+                <a href="index.html" class="flex items-center justify-center gap-2 w-full p-2.5 rounded-xl text-red-500 hover:bg-red-50 border border-transparent hover:border-red-100 transition-all font-bold text-sm">
+                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 overflow-y-auto relative bg-slate-50">
+            <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 py-4 flex justify-between items-center">
+                <div class="relative w-96">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" placeholder="Tìm bài học, từ vựng, ngữ pháp..." class="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm transition-all">
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-3 cursor-pointer group pr-4 border-r border-slate-200">
+                        <div class="text-right">
+                            <p class="text-sm font-bold text-slate-800">Học sinh E-Elite</p>
+                            <p class="text-[10px] text-indigo-500 font-medium uppercase tracking-wider">Level 15: English Explorer</p>
+                        </div>
+                        <img src="https://ui-avatars.com/api/?name=Student&background=4f46e5&color=fff" class="w-10 h-10 rounded-xl border-2 border-white shadow-sm">
+                    </div>
+                    <a href="index.html" class="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm" title="Đăng xuất">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
+            </header>
+
+            <!-- TAB: DASHBOARD (ĐÃ ĐƯỢC LÀM PHONG PHÚ) -->
+            <div id="tab-dashboard" class="tab-content active p-8">
+                <div class="mb-8">
+                    <h1 class="text-2xl font-bold text-slate-900">Chào mừng quay trở lại, Học viên xuất sắc! 🌟</h1>
+                    <p class="text-slate-500 italic">Hôm nay chúng ta sẽ chinh phục thử thách nào đây?</p>
+                </div>
+
+                <!-- Banner Sự kiện nổi bật -->
+                <div class="w-full bg-gradient-to-r from-indigo-600 to-blue-500 rounded-3xl p-8 mb-8 text-white relative overflow-hidden flex items-center shadow-xl">
+                    <div class="relative z-10 max-w-lg">
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase mb-4 inline-block backdrop-blur-sm border border-white/30">Sự kiện tháng 10</span>
+                        <h2 class="text-3xl font-black mb-3">Cuộc thi English Champion 2026</h2>
+                        <p class="text-indigo-50 mb-6 text-sm leading-relaxed">Tham gia ngay để thể hiện tài năng tiếng Anh, nhận hàng ngàn phần quà hấp dẫn và giấy chứng nhận độc quyền từ E-Elite Academy.</p>
+                        <button class="bg-white text-indigo-600 px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-indigo-50 hover:scale-105 transition-all flex items-center gap-2">
+                            Tham gia ngay <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="absolute right-0 top-0 h-full w-1/2 opacity-30 mix-blend-overlay">
+                        <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80" alt="Students learning" class="w-full h-full object-cover">
+                    </div>
+                    <div class="absolute right-10 bottom-0 opacity-80 pointer-events-none">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4185/4185566.png" class="w-48 h-48 drop-shadow-2xl" alt="Trophy">
+                    </div>
+                </div>
+                
+                <!-- Thống kê học tập -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 text-blue-50 opacity-50"><i class="fas fa-spell-check text-8xl"></i></div>
+                        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-4 relative z-10"><i class="fas fa-spell-check text-xl"></i></div>
+                        <p class="text-slate-500 text-sm font-medium relative z-10">Từ vựng đã học</p>
+                        <h3 class="text-2xl font-bold text-slate-800 relative z-10">450</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 text-orange-50 opacity-50"><i class="fas fa-microphone-alt text-8xl"></i></div>
+                        <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 mb-4 relative z-10"><i class="fas fa-microphone-alt text-xl"></i></div>
+                        <p class="text-slate-500 text-sm font-medium relative z-10">Luyện nói (phút)</p>
+                        <h3 class="text-2xl font-bold text-slate-800 relative z-10">120m</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 text-indigo-50 opacity-50"><i class="fas fa-fire text-8xl"></i></div>
+                        <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 mb-4 relative z-10"><i class="fas fa-fire text-xl"></i></div>
+                        <p class="text-slate-500 text-sm font-medium relative z-10">Day Streak</p>
+                        <h3 class="text-2xl font-bold text-slate-800 relative z-10">07 Days</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 text-red-50 opacity-50"><i class="fas fa-medal text-8xl"></i></div>
+                        <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center text-red-600 mb-4 relative z-10"><i class="fas fa-medal text-xl"></i></div>
+                        <p class="text-slate-500 text-sm font-medium relative z-10">Huy hiệu</p>
+                        <h3 class="text-2xl font-bold text-slate-800 relative z-10">12</h3>
+                    </div>
+                </div>
+
+                <!-- Lộ trình & Gợi ý -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                    <div class="col-span-2">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2"><i class="fas fa-map-signs text-indigo-500"></i> Bài học đang diễn ra</h3>
+                            <a href="khoahoc.html" class="text-sm font-bold text-indigo-600 hover:underline">Xem tất cả lộ trình</a>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-6 items-center card-hover mb-4">
+                            <div class="w-full md:w-48 h-32 rounded-xl overflow-hidden shadow-md shrink-0 relative group cursor-pointer">
+                                <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Unit 4">
+                                <div class="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors"></div>
+                                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <i class="fas fa-play-circle text-4xl text-white drop-shadow-md"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 w-full">
+                                <p class="text-sm font-bold text-indigo-600 mb-1">Đang học • Unit 4</p>
+                                <h4 class="text-xl font-black text-slate-800 mb-2">Did you go to the party?</h4>
+                                <p class="text-sm text-slate-500 mb-4">Làm quen với thì quá khứ đơn (Past Simple) và từ vựng về các hoạt động vui chơi trong bữa tiệc.</p>
+                                <div class="flex items-center gap-4">
+                                    <div class="flex-1 bg-slate-100 rounded-full h-2.5">
+                                        <div class="bg-indigo-600 h-2.5 rounded-full relative" style="width: 45%">
+                                            <div class="absolute -right-2 -top-1 w-4 h-4 bg-white border-2 border-indigo-600 rounded-full shadow-sm"></div>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-slate-400 font-bold whitespace-nowrap">45%</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 border-dashed flex flex-col md:flex-row gap-6 items-center opacity-70">
+                            <div class="w-full md:w-48 h-32 rounded-xl overflow-hidden shadow-sm shrink-0 relative">
+                                <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover grayscale" alt="Unit 5">
+                                <div class="absolute inset-0 bg-slate-900/40 flex items-center justify-center backdrop-blur-[2px]">
+                                    <i class="fas fa-lock text-3xl text-white"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 w-full">
+                                <p class="text-sm font-bold text-slate-500 mb-1">Tiếp theo • Unit 5</p>
+                                <h4 class="text-xl font-black text-slate-600 mb-2">Where will you be this weekend?</h4>
+                                <p class="text-sm text-slate-500">Hoàn thành bài tập của Unit 4 để mở khóa bài học thì tương lai này nhé.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fas fa-lightbulb text-amber-500"></i> Gợi ý hôm nay</h3>
+                        <div class="space-y-4">
+                            <!-- Game Suggestion -->
+                            <a href="game.html" class="block bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex gap-4 card-hover">
+                                <div class="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 shrink-0">
+                                    <i class="fas fa-gamepad text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm">Vocabulary Ninja 🥷</h4>
+                                    <p class="text-xs text-slate-500 mt-1">Vừa chơi game vừa ôn tập từ vựng cực kỳ hiệu quả.</p>
+                                </div>
+                            </a>
+                            
+                            <!-- Test Suggestion -->
+                            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex gap-4 card-hover cursor-pointer" onclick="switchTab('tests')">
+                                <div class="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center text-red-600 shrink-0">
+                                    <i class="fas fa-clock text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm">Bài test 15 Phút</h4>
+                                    <p class="text-xs text-red-500 font-medium mt-1"><i class="fas fa-exclamation-circle"></i> Hạn chót: 23:59 hôm nay</p>
+                                </div>
+                            </div>
+
+                             <!-- Study Group -->
+                             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden card-hover">
+                                <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=400&q=80" alt="Group Study" class="w-full h-24 object-cover">
+                                <div class="p-4">
+                                    <h4 class="font-bold text-slate-800 text-sm mb-1">Nhóm tự học Online</h4>
+                                    <p class="text-xs text-slate-500 mb-3"><span class="w-2 h-2 rounded-full bg-emerald-500 inline-block mr-1"></span> 5 bạn đang học</p>
+                                    <button onclick="openStudyModal()" class="w-full py-2 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-600 hover:text-white transition-all">Vào phòng ngay</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: KHO TÀI LIỆU -->
+            <div id="tab-docs" class="tab-content p-8">
+                <div class="mb-8 flex justify-between items-end">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900">Kho tài liệu học tập 📚</h2>
+                        <p class="text-slate-500">Tổng hợp kiến thức trọng tâm Tiếng Anh lớp 5</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="px-4 py-2 bg-indigo-600 text-white border border-indigo-600 rounded-lg text-sm font-bold shadow-sm">Tất cả</button>
+                        <button class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50">Ngữ pháp</button>
+                        <button class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50">Từ vựng</button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="docs-grid">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 card-hover">
+                        <div class="w-full h-32 bg-indigo-50 rounded-xl mb-4 flex items-center justify-center text-indigo-600">
+                            <i class="fas fa-file-pdf text-4xl"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-800 mb-1">E-Elite: Unit 1 - What's your address?</h4>
+                        <p class="text-xs text-slate-400 mb-4 italic">Đã có 1.2k lượt tải về</p>
+                        <button class="w-full py-2 bg-slate-100 text-slate-700 rounded-xl text-xs font-bold hover:bg-indigo-600 hover:text-white transition-all">Tải tài liệu PDF</button>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 card-hover">
+                        <div class="w-full h-32 bg-emerald-50 rounded-xl mb-4 flex items-center justify-center text-emerald-600">
+                            <i class="fas fa-file-word text-4xl"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-800 mb-1">Tổng hợp 100 động từ bất quy tắc</h4>
+                        <p class="text-xs text-slate-400 mb-4 italic">Bí kíp học giỏi ngữ pháp</p>
+                        <button class="w-full py-2 bg-slate-100 text-slate-700 rounded-xl text-xs font-bold hover:bg-indigo-600 hover:text-white transition-all">Xem bản Word</button>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 card-hover">
+                        <div class="w-full h-32 bg-amber-50 rounded-xl mb-4 flex items-center justify-center text-amber-600">
+                            <i class="fas fa-play-circle text-4xl"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-800 mb-1">Flashcards Unit 5: My Dream Job</h4>
+                        <p class="text-xs text-slate-400 mb-4 italic">Học từ vựng qua hình ảnh</p>
+                        <button class="w-full py-2 bg-slate-100 text-slate-700 rounded-xl text-xs font-bold hover:bg-indigo-600 hover:text-white transition-all">Mở Flashcards</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: KHO ĐỀ KIỂM TRA (GIỮ NGUYÊN) -->
+            <div id="tab-tests" class="tab-content p-8">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-slate-900">Kho đề kiểm tra trực tuyến 📝</h2>
+                    <p class="text-slate-500 italic">Chọn một đề và bắt đầu làm bài ngay để tích lũy XP!</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <a href="https://wayground.com/join?gc=55187841" target="_blank" class="bg-white p-6 rounded-3xl border-2 border-slate-100 hover:border-indigo-500 transition-all flex items-center gap-6 group shadow-sm">
+                        <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform"><i class="fas fa-pencil-alt"></i></div>
+                        <div>
+                            <h4 class="font-black text-slate-800 text-lg">Đề thi Giữa Học Kỳ 1 - Đề 01</h4>
+                            <p class="text-sm text-slate-500">Mã phòng: 55187841 | Thời gian: 45 phút</p>
+                        </div>
+                    </a>
+                    <a href="https://wayground.com/join?gc=05052801" target="_blank" class="bg-white p-6 rounded-3xl border-2 border-slate-100 hover:border-indigo-500 transition-all flex items-center gap-6 group shadow-sm">
+                        <div class="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform"><i class="fas fa-bolt"></i></div>
+                        <div>
+                            <h4 class="font-black text-slate-800 text-lg">Luyện tập từ vựng Unit 1-3</h4>
+                            <p class="text-sm text-slate-500">Mã phòng: 05052801 | Thử thách tốc độ</p>
+                        </div>
+                    </a>
+                    <a href="https://wayground.com/join?gc=20851073" target="_blank" class="bg-white p-6 rounded-3xl border-2 border-slate-100 hover:border-indigo-500 transition-all flex items-center gap-6 group shadow-sm">
+                        <div class="w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform"><i class="fas fa-graduation-cap"></i></div>
+                        <div>
+                            <h4 class="font-black text-slate-800 text-lg">Đề ôn tập Cuối Học Kỳ 1</h4>
+                            <p class="text-sm text-slate-500">Mã phòng: 20851073 | 40 câu trắc nghiệm</p>
+                        </div>
+                    </a>
+                    <a href="https://wayground.com/join?gc=36030849&autostart=true" target="_blank" class="bg-white p-6 rounded-3xl border-2 border-slate-100 hover:border-indigo-500 transition-all flex items-center gap-6 group shadow-sm">
+                        <div class="w-16 h-16 bg-red-500 rounded-2xl flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform"><i class="fas fa-fire"></i></div>
+                        <div>
+                            <h4 class="font-black text-slate-800 text-lg italic">Thách đấu: Super English King 👑</h4>
+                            <p class="text-sm text-slate-500 uppercase font-bold text-red-500">Bấm để bắt đầu ngay!</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- TAB: CỘNG ĐỒNG E-ELITE -->
+            <div id="tab-discussions" class="tab-content p-8">
+                <div class="mb-8 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900">Cộng đồng Học tập 💬</h2>
+                        <p class="text-slate-500 italic">Cùng nhau học hỏi, cùng nhau tiến bộ!</p>
+                    </div>
+                    <button class="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold text-sm shadow-lg shadow-indigo-200">+ Đăng bài mới</button>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex items-start gap-4 mb-4">
+                            <img src="https://ui-avatars.com/api/?name=MK&background=f59e0b&color=fff" class="w-10 h-10 rounded-full">
+                            <div class="flex-1">
+                                <h5 class="font-bold text-slate-800 text-sm">Lê Minh Khang <span class="text-[10px] bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full ml-2">Top 1 Tuần</span></h5>
+                                <p class="text-xs text-slate-400 italic">vừa đăng 2 giờ trước</p>
+                                <p class="mt-3 text-slate-700 leading-relaxed text-sm">
+                                    Mọi người ơi, có ai biết cách nhớ từ vựng "Irregular Verbs" nhanh không ạ? Em học mãi mà cứ quên :( 
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-6 pt-4 border-t border-slate-50 text-slate-400 text-xs">
+                            <span class="hover:text-indigo-600 cursor-pointer"><i class="far fa-heart mr-1"></i> 24 Thích</span>
+                            <span class="hover:text-indigo-600 cursor-pointer"><i class="far fa-comment mr-1"></i> 12 Phản hồi</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex items-start gap-4 mb-4">
+                            <img src="https://ui-avatars.com/api/?name=AN&background=3b82f6&color=fff" class="w-10 h-10 rounded-full">
+                            <div class="flex-1">
+                                <h5 class="font-bold text-slate-800 text-sm">Trần An Nhiên</h5>
+                                <p class="text-xs text-slate-400 italic">vừa đăng 5 giờ trước</p>
+                                <p class="mt-3 text-slate-700 leading-relaxed text-sm">
+                                    Thử thách ngày hôm nay của mình là học thuộc 10 từ mới về chủ đề "Health Care". Ai tham gia cùng mình không? 🙋‍♀️
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-6 pt-4 border-t border-slate-50 text-slate-400 text-xs">
+                            <span class="hover:text-indigo-600 cursor-pointer"><i class="far fa-heart mr-1"></i> 45 Thích</span>
+                            <span class="hover:text-indigo-600 cursor-pointer"><i class="far fa-comment mr-1"></i> 8 Phản hồi</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: TỪ ĐIỂN ANH - VIỆT (GIỮ NGUYÊN) -->
+            <div id="tab-dictionary" class="tab-content p-8">
+                <div class="max-w-3xl mx-auto">
+                    <div class="text-center mb-8">
+                        <div class="inline-block p-3 bg-indigo-100 text-indigo-600 rounded-2xl mb-4">
+                            <i class="fas fa-book-open text-3xl"></i>
+                        </div>
+                        <h1 class="text-3xl font-black text-slate-900 mb-2 italic">E-Elite Dictionary 🇻🇳</h1>
+                        <p class="text-slate-500">Tra từ điển Anh - Việt thông minh dành cho học sinh lớp 5.</p>
+                    </div>
+                    
+                    <div class="flex gap-2 p-2 bg-white rounded-3xl border-2 border-slate-100 shadow-xl focus-within:border-indigo-500 transition-all mb-8">
+                        <input id="dict-input" type="text" placeholder="Nhập từ tiếng Anh bạn muốn tra..." class="flex-1 px-6 outline-none font-bold text-slate-700 text-lg bg-transparent">
+                        <button onclick="lookupDict()" class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black hover:bg-indigo-700 transition-all flex items-center gap-2">
+                            <i class="fas fa-search"></i> Tra cứu
+                        </button>
+                    </div>
+                    
+                    <div id="dict-loading" class="hidden text-center py-10">
+                        <div class="loader mb-4"></div>
+                        <p class="text-sm font-bold text-slate-400 animate-pulse uppercase tracking-widest">Đang tìm kiếm và dịch nghĩa...</p>
+                    </div>
+
+                    <div id="dict-out" class="space-y-6">
+                        <div class="text-center py-20 opacity-20">
+                            <i class="fas fa-book-sparkles text-7xl mb-4"></i>
+                            <p class="font-black uppercase tracking-widest text-sm text-indigo-900">Nhập từ để bắt đầu học nhé!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: MASON AI (GIỮ NGUYÊN) -->
+            <div id="tab-mason" class="tab-content p-8">
+                <div class="max-w-4xl mx-auto bg-gradient-to-br from-slate-900 to-indigo-950 rounded-[2.5rem] p-10 text-white shadow-2xl">
+                    <div id="mason-board" class="min-h-[300px] flex flex-col justify-center">
+                         <div id="mason-intro" class="text-center">
+                            <div class="w-20 h-20 bg-indigo-500/20 rounded-3xl flex items-center justify-center text-indigo-400 mx-auto mb-6 border border-indigo-500/30">
+                                <i class="fas fa-robot text-4xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-black mb-4">Mason AI Advisor</h3>
+                            <p class="text-slate-400 mb-8 max-w-md mx-auto italic">Tôi sẽ phân tích quá trình học tập của bạn và đưa ra lời khuyên cá nhân hóa.</p>
+                            <button onclick="runMasonAI()" id="btn-mason-run" class="bg-indigo-600 px-10 py-4 rounded-xl font-black hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20">Bắt đầu phân tích</button>
+                         </div>
+                         <div id="mason-loading" class="hidden text-center"><div class="loader border-indigo-300"></div></div>
+                         <div id="mason-result" class="hidden"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: BẢNG XẾP HẠNG -->
+            <div id="tab-leaderboard" class="tab-content p-8">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-slate-900">Bảng vàng vinh danh 🏆</h2>
+                    <p class="text-slate-500">Những chiến binh xuất sắc nhất tuần này</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="students-grid"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL: PHÒNG TỰ HỌC ONLINE -->
+    <div id="studyModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 hidden backdrop-blur-sm">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="bg-indigo-600 p-8 text-white flex justify-between items-center">
+                <h2 class="text-2xl font-black italic">Phòng tự học Online</h2>
+                <button onclick="closeStudyModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-10 text-center">
+                <p class="text-slate-500 mb-8 font-medium">Chọn nền tảng bạn muốn dùng để học nhóm với bạn bè:</p>
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <button onclick="goStudy('meet')" class="p-6 rounded-3xl border-2 border-slate-100 hover:border-emerald-500 transition-all flex flex-col items-center gap-3">
+                        <img src="https://www.gstatic.com/meet/google_meet_primary_horizontal_2020q4_logo_be3f1704ada34b0512808544e45d4444.svg" class="h-6">
+                        <span class="font-bold text-sm text-slate-600">Google Meet</span>
+                    </button>
+                    <button onclick="goStudy('zoom')" class="p-6 rounded-3xl border-2 border-slate-100 hover:border-blue-500 transition-all flex flex-col items-center gap-3">
+                        <img src="https://st1.zoom.us/static/6.3.31061/image/new/ZoomLogo.png" class="h-6">
+                        <span class="font-bold text-sm text-slate-600">Zoom Video</span>
+                    </button>
+                </div>
+                <p class="text-[10px] text-slate-400 italic italic">Lưu ý: Bạn cần có tài khoản Zoom hoặc Google để tham gia.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MOCK_DATA = {
+            students: [
+                { name: "Lê Minh Khang", xp: 4500, level: "Champion", avatar: "https://ui-avatars.com/api/?name=MK&background=f59e0b&color=fff", rank: 1, color: "text-amber-500", bg: "bg-amber-50" },
+                { name: "Trần An Nhiên", xp: 3200, level: "Star", avatar: "https://ui-avatars.com/api/?name=AN&background=3b82f6&color=fff", rank: 2, color: "text-blue-500", bg: "bg-blue-50" },
+                { name: "Nguyễn Bảo Nam", xp: 2800, level: "Star", avatar: "https://ui-avatars.com/api/?name=BN&background=10b981&color=fff", rank: 3, color: "text-emerald-500", bg: "bg-emerald-50" },
+                { name: "Vũ Khánh Linh", xp: 2100, level: "Explorer", avatar: "https://ui-avatars.com/api/?name=KL&background=6366f1&color=fff", rank: 4, color: "text-indigo-500", bg: "bg-indigo-50" }
+            ]
+        };
+
+        // GIỮ NGUYÊN HÀM DỊCH TỰ ĐỘNG & TỪ ĐIỂN
+        async function translateText(text) {
+            try {
+                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|vi`);
+                const data = await res.json();
+                return data.responseData.translatedText;
+            } catch (e) {
+                return "Không thể dịch nghĩa lúc này.";
+            }
+        }
+
+        async function lookupDict() {
+            const word = document.getElementById('dict-input').value.trim().toLowerCase();
+            if (!word) return;
+            
+            const loader = document.getElementById('dict-loading');
+            const out = document.getElementById('dict-out');
+            
+            loader.style.display = 'block';
+            out.innerHTML = '';
+
+            try {
+                const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+                if (!response.ok) throw new Error("Not found");
+                const data = await response.json();
+                const entry = data[0];
+
+                const firstMeaning = entry.meanings[0]?.definitions[0]?.definition || "";
+                const firstExample = entry.meanings[0]?.definitions[0]?.example || "";
+                
+                const translatedMeaning = await translateText(firstMeaning);
+                const translatedExample = firstExample ? await translateText(firstExample) : "";
+
+                out.innerHTML = `
+                    <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-2xl animate-fadeIn relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-6 opacity-5">
+                            <i class="fas fa-language text-8xl"></i>
+                        </div>
+
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 class="text-5xl font-black text-indigo-600 italic leading-none mb-2">${entry.word}</h2>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-slate-400 font-bold tracking-widest uppercase text-xs">${entry.phonetic || ''}</span>
+                                    <button onclick="speak('${entry.word}')" class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all">
+                                        <i class="fas fa-volume-up text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 p-6 rounded-3xl mb-6 relative">
+                            <div class="absolute -top-3 left-6 bg-amber-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">Nghĩa tiếng Việt</div>
+                            <p class="text-xl font-black text-amber-900 mb-2 mt-2 leading-relaxed italic">✨ ${translatedMeaning}</p>
+                            ${translatedExample ? `
+                                <div class="mt-4 pt-4 border-t border-amber-200/50">
+                                    <p class="text-[10px] font-bold text-amber-600 uppercase mb-1">Ví dụ minh họa:</p>
+                                    <p class="text-amber-800 text-sm italic">"${translatedExample}"</p>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="space-y-4">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Định nghĩa tiếng Anh:</p>
+                            ${entry.meanings.slice(0, 2).map(m => `
+                                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                    <span class="text-[9px] font-black uppercase text-indigo-500 bg-white border border-indigo-100 px-2 py-0.5 rounded-md mb-2 inline-block">${m.partOfSpeech}</span>
+                                    <p class="text-slate-700 text-sm">${m.definitions[0].definition}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } catch (err) {
+                out.innerHTML = `<div class="text-center py-10 bg-red-50 rounded-3xl text-red-600 font-bold italic">Không tìm thấy từ này trong hệ thống.</div>`;
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+
+        function speak(text) {
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = text;
+            msg.lang = 'en-US';
+            window.speechSynthesis.speak(msg);
+        }
+
+        function switchTab(tabId) { 
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active-link'));
+            const tab = document.getElementById('tab-' + tabId);
+            if(tab) tab.classList.add('active');
+            if (event && event.currentTarget) event.currentTarget.classList.add('active-link');
+        }
+
+        function renderLeaderboard() {
+            const grid = document.getElementById('students-grid');
+            grid.innerHTML = MOCK_DATA.students.map(s => `
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm text-center card-hover">
+                    <div class="relative inline-block mb-4">
+                        <img src="${s.avatar}" class="w-20 h-20 rounded-2xl mx-auto border-2 border-white shadow-md">
+                        <div class="absolute -bottom-2 -right-2 w-8 h-8 ${s.bg} rounded-full flex items-center justify-center font-bold text-xs ${s.color} border-2 border-white">${s.rank}</div>
+                    </div>
+                    <h5 class="font-bold text-slate-800 mb-1 truncate">${s.name}</h5>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">${s.level}</p>
+                    <div class="py-2 bg-slate-50 rounded-xl text-indigo-600 font-black text-sm">${s.xp.toLocaleString()} XP</div>
+                </div>
+            `).join('');
+        }
+
+        function openStudyModal() { document.getElementById('studyModal').classList.remove('hidden'); }
+        function closeStudyModal() { document.getElementById('studyModal').classList.add('hidden'); }
+        function goStudy(p) { window.open(p==='meet'?'https://meet.google.com/':'https://zoom.us/', '_blank'); closeStudyModal(); }
+
+        // GIỮ NGUYÊN MASON AI
+        function runMasonAI() {
+            const intro = document.getElementById('mason-intro');
+            const load = document.getElementById('mason-loading');
+            const res = document.getElementById('mason-result');
+            
+            intro.classList.add('hidden');
+            load.classList.remove('hidden');
+            
+            setTimeout(() => {
+                load.classList.add('hidden');
+                res.classList.remove('hidden');
+                res.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-4 mb-6">
+                            <i class="fas fa-check-circle text-emerald-400 text-3xl"></i>
+                            <h4 class="text-xl font-bold italic">Báo cáo phân tích E-Elite AI</h4>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white/10 p-4 rounded-2xl border border-white/10">
+                                <p class="text-slate-400 text-xs mb-1 uppercase font-bold">Điểm mạnh</p>
+                                <p class="text-sm">Vốn từ vựng Unit 1-3 của bạn rất tốt (Top 5%).</p>
+                            </div>
+                            <div class="bg-white/10 p-4 rounded-2xl border border-white/10">
+                                <p class="text-slate-400 text-xs mb-1 uppercase font-bold">Cần cải thiện</p>
+                                <p class="text-sm">Kỹ năng Speaking cần luyện tập thêm 15p mỗi ngày.</p>
+                            </div>
+                        </div>
+                        <div class="mt-8 pt-8 border-t border-white/5">
+                            <p class="text-indigo-300 font-bold italic mb-4">🎯 Lời khuyên cho tuần tới:</p>
+                            <ul class="space-y-2 text-sm text-slate-300">
+                                <li>• Hãy hoàn thành ít nhất 2 đề kiểm tra trong Kho đề mới.</li>
+                                <li>• Tham gia thảo luận trong cộng đồng để tăng XP nhanh hơn.</li>
+                            </ul>
+                            <button onclick="location.reload()" class="mt-8 text-xs text-slate-500 hover:text-white transition-colors underline">Quay lại</button>
+                        </div>
+                    </div>
+                `;
+            }, 2500);
+        }
+
+        window.onload = () => {
+            renderLeaderboard();
+            document.getElementById('dict-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') lookupDict(); });
+        };
+    </script>
+</body>
+</html>

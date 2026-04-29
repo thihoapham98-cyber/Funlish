@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siêu Học Viện Ngôn Ngữ - Kid Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --grass-dark: #1e4d1a;
+            --grass-light: #2d6a28;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at top right, #1e1b4b 0%, #020617 100%);
+        }
+
+        .font-bungee { font-family: 'Bungee', cursive; }
+
+        /* Hiệu ứng trang chủ */
+        .card-anim {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 4px solid transparent;
+        }
+        .card-anim:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: #6366f1;
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Tối ưu kích thước Game Visual */
+        #game-visual { 
+            height: 260px; /* Thu nhỏ từ 380px */
+            border-radius: 2rem; 
+            overflow: hidden; 
+            position: relative; 
+            margin-bottom: 1rem;
+            border: 4px solid rgba(255,255,255,0.1);
+        }
+
+        .premium-pitch {
+            background: linear-gradient(var(--grass-dark), var(--grass-light));
+            background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0 40px, transparent 40px 80px);
+        }
+
+        .goal-net {
+            position: absolute; top: 5px; left: 50%; transform: translateX(-50%);
+            width: 200px; height: 80px; border: 5px solid #fff; border-bottom: none;
+            background: repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0 2px, transparent 2px 6px);
+            z-index: 5;
+        }
+
+        /* Đồ họa nhân vật */
+        .haaland-pro { position: absolute; width: 70px; height: 100px; transition: all 0.6s ease-out; z-index: 20; }
+        .neuer-pro { position: absolute; width: 65px; height: 95px; top: 30px; left: 50%; transform: translateX(-50%); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10; }
+        
+        .dive-left { transform: translate(-120%, 30%) rotate(-80deg) !important; }
+        .dive-right { transform: translate(50%, 30%) rotate(80deg) !important; }
+
+        .running { animation: runStep 0.15s infinite; }
+        @keyframes runStep { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-5px) rotate(2deg); } }
+
+        /* Hiệu ứng khác */
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .shake { animation: shake 0.4s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+
+        /* Khán giả nhún nhảy */
+        .fan-zone { position: absolute; bottom: 0; width: 100%; display: flex; justify-content: space-around; pointer-events: none; }
+        .fan { animation: jump 0.5s infinite alternate; font-size: 1.2rem; }
+        @keyframes jump { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+    <header class="max-w-6xl mx-auto mb-6 text-center">
+        <h1 class="text-4xl md:text-5xl font-bungee tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-red-500 drop-shadow-lg">
+            SUPER LANGUAGE ACADEMY
+        </h1>
+        <div class="flex justify-center gap-4 mt-2">
+            <span class="bg-indigo-600 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Dành cho siêu nhí</span>
+            <div class="text-yellow-400 font-bold">⭐ Điểm: <span id="total-score">0</span></div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto">
+        <!-- MENU TRANG CHỦ -->
+        <div id="menu-screen" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div onclick="startGame('haaland')" class="card-anim bg-gradient-to-br from-blue-600 to-indigo-800 p-6 rounded-[2.5rem] cursor-pointer relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 text-8xl opacity-20 group-hover:rotate-12 transition-transform">⚽</div>
+                <h3 class="text-2xl font-bungee text-white">Striker Protocol</h3>
+                <p class="text-blue-100 text-sm mt-2">Sút tung lưới Neuer cùng Haaland!</p>
+                <div class="mt-4 bg-white/20 w-fit px-3 py-1 rounded-lg text-xs font-bold">HOT GAME 🔥</div>
+            </div>
+
+            <div onclick="startGame('shooter')" class="card-anim bg-gradient-to-br from-rose-500 to-red-700 p-6 rounded-[2.5rem] cursor-pointer relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 text-8xl opacity-20 group-hover:scale-110 transition-transform">🎯</div>
+                <h3 class="text-2xl font-bungee text-white">Precision Aim</h3>
+                <p class="text-rose-100 text-sm mt-2">Bắn cung trúng đích, pháo hoa rực rỡ.</p>
+            </div>
+
+            <div onclick="startGame('falling')" class="card-anim bg-gradient-to-br from-amber-400 to-orange-600 p-6 rounded-[2.5rem] cursor-pointer relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 text-8xl opacity-20 group-hover:-translate-y-2 transition-transform">🍎</div>
+                <h3 class="text-2xl font-bungee text-white">Harvest Logic</h3>
+                <p class="text-amber-100 text-sm mt-2">Nhanh tay hứng táo, học từ loại hay.</p>
+            </div>
+
+            <div onclick="startGame('tom')" class="card-anim bg-gradient-to-br from-cyan-500 to-blue-600 p-6 rounded-[2.5rem] cursor-pointer relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 text-8xl opacity-20 group-hover:translate-x-2 transition-transform">🐱</div>
+                <h3 class="text-2xl font-bungee text-white">Velocity Cat</h3>
+                <p class="text-cyan-100 text-sm mt-2">Giúp Mèo Tom vượt rào về nhà nhé.</p>
+            </div>
+
+            <div onclick="startGame('matching')" class="card-anim bg-gradient-to-br from-purple-500 to-fuchsia-700 p-6 rounded-[2.5rem] cursor-pointer relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 text-8xl opacity-20 group-hover:rotate-45 transition-transform">🎴</div>
+                <h3 class="text-2xl font-bungee text-white">Synapse Match</h3>
+                <p class="text-purple-100 text-sm mt-2">Thử thách trí nhớ siêu phàm.</p>
+            </div>
+
+            <div onclick="startGame('zombie')" class="card-anim bg-gradient-to-br from-emerald-500 to-teal-700 p-6 rounded-[2.5rem] cursor-pointer relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 text-8xl opacity-20 group-hover:skew-y-3 transition-transform">🧟</div>
+                <h3 class="text-2xl font-bungee text-white">The Survivor</h3>
+                <p class="text-emerald-100 text-sm mt-2">Xây dựng câu, đẩy lùi thử thách.</p>
+            </div>
+        </div>
+
+        <!-- MÀN HÌNH CHƠI GAME -->
+        <div id="game-screen" class="hidden">
+            <div class="flex justify-between items-center mb-4">
+                <button onclick="goHome()" class="bg-white/10 hover:bg-white/20 px-6 py-2 rounded-full font-bold text-sm transition-all">← THOÁT</button>
+                <div class="flex gap-3">
+                    <div class="glass-panel px-4 py-2 rounded-xl text-yellow-400 font-bold text-sm">LV: <span id="level-ui">1</span></div>
+                    <div class="glass-panel px-4 py-2 rounded-xl text-rose-400 font-bold text-sm">SAI: <span id="tries-ui">0</span>/2</div>
+                </div>
+            </div>
+
+            <!-- GAME VISUAL (Đã thu nhỏ kích thước) -->
+            <div id="game-visual" class="shadow-2xl"></div>
+
+            <!-- QUESTION CARD -->
+            <div id="question-card" class="glass-panel p-6 md:p-8 rounded-[2rem] relative">
+                <div id="progress-bar" class="absolute top-0 left-0 h-1 bg-indigo-500 transition-all duration-500" style="width: 0%"></div>
+                <div class="text-center mb-6">
+                    <p id="q-text" class="text-xl md:text-2xl font-bold text-white"></p>
+                </div>
+                <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                <div id="matching-grid" class="hidden grid grid-cols-4 gap-3"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Thông báo Goal / Success -->
+    <div id="noti-layer" class="fixed inset-0 flex items-center justify-center z-[200] pointer-events-none hidden">
+        <div class="text-center animate-bounce">
+            <h2 id="noti-text" class="text-8xl font-bungee text-yellow-400 drop-shadow-2xl">GOAL!</h2>
+            <p class="text-2xl font-bold text-white mt-2">TUYỆT VỜI QUÁ!</p>
+        </div>
+    </div>
+
+    <!-- Modal kết quả -->
+    <div id="status-modal" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[100] flex items-center justify-center hidden p-6">
+        <div class="glass-panel p-10 rounded-[3rem] max-w-sm w-full text-center border-indigo-500/50">
+            <div id="modal-icon" class="text-8xl mb-6">🏆</div>
+            <h2 id="modal-title" class="text-3xl font-bungee mb-4 text-white">CHIẾN THẮNG</h2>
+            <p id="modal-msg" class="text-gray-300 mb-8">Bé giỏi quá, tiếp tục phát huy nhé!</p>
+            <button onclick="goHome()" class="bg-indigo-600 hover:bg-indigo-500 w-full py-4 rounded-2xl font-bold text-white shadow-lg">TIẾP TỤC</button>
+        </div>
+    </div>
+
+    <script>
+        const QUESTIONS_PER_LEVEL = 5;
+        const DATA = {
+            haaland: { 1: [
+                { q: "Haaland ___ the goal!", a: "scores", o: ["scores", "cries", "eats", "sleeps"] },
+                { q: "Neuer ___ the ball.", a: "catches", o: ["catches", "ignores", "flies", "sings"] },
+                { q: "The striker ___ fast.", a: "runs", o: ["runs", "sits", "walks", "talks"] },
+                { q: "Fans ___ loudly.", a: "cheer", o: ["cheer", "whisper", "fall", "sleep"] },
+                { q: "The match ___ now.", a: "starts", o: ["starts", "ends", "breaks", "hides"] }
+            ]},
+            shooter: { 1: [ { q: "The bird is ___ the tree.", a: "on", o: ["on", "at", "under", "in"] }, { q: "Fish live ___ water.", a: "in", o: ["in", "on", "at", "to"] }, { q: "Go ___ school.", a: "to", o: ["to", "from", "at", "on"] }, { q: "Stay ___ home.", a: "at", o: ["at", "on", "in", "by"] }, { q: "Sit ___ the chair.", a: "on", o: ["on", "in", "at", "by"] } ]},
+            falling: { 1: [ { q: "Hứng danh từ (Noun):", a: "Candy", o: ["Candy", "Run", "Fast", "Sadly"] }, { q: "Hứng danh từ (Noun):", a: "Ball", o: ["Ball", "Sing", "Blue", "Quickly"] }, { q: "Hứng danh từ (Noun):", a: "Cake", o: ["Cake", "Jump", "Happy", "There"] }, { q: "Hứng danh từ (Noun):", a: "Toy", o: ["Toy", "Speak", "Large", "Soon"] }, { q: "Hứng danh từ (Noun):", a: "Dog", o: ["Dog", "Dance", "Cold", "Often"] } ]},
+            tom: { 1: [ { q: "I ___ to play.", a: "like", o: ["like", "likes", "liking", "liked"] }, { q: "He ___ a cat.", a: "has", o: ["has", "have", "having", "had"] }, { q: "We ___ students.", a: "are", o: ["are", "am", "is", "be"] }, { q: "She ___ pizza.", a: "eats", o: ["eats", "eat", "eating", "ate"] }, { q: "They ___ now.", a: "sing", o: ["sing", "sings", "singing", "sang"] } ]},
+            zombie: { 1: [ { q: "___ you happy?", a: "Are", o: ["Are", "Is", "Am", "Be"] }, { q: "I ___ a boy.", a: "am", o: ["am", "is", "are", "be"] }, { q: "It ___ a pen.", a: "is", o: ["is", "am", "are", "be"] }, { q: "They ___ red.", a: "are", o: ["are", "am", "is", "be"] }, { q: "He ___ 10.", a: "is", o: ["is", "am", "are", "be"] } ]}
+        };
+
+        const MATCHING_POOLS = { 1: [ {en: "Red", vi: "Đỏ"}, {en: "Blue", vi: "Xanh"}, {en: "Sun", vi: "Mặt trời"}, {en: "Moon", vi: "Mặt trăng"}, {en: "Star", vi: "Ngôi sao"} ] };
+
+        let state = {
+            game: '', lv: 1, qIdx: 0, triesInQuestion: 0,
+            totalScore: parseInt(localStorage.getItem('kid_score')) || 0,
+            applesCollected: 0,
+            matchingSelected: []
+        };
+
+        function goHome() {
+            document.getElementById('menu-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('status-modal').classList.add('hidden');
+        }
+
+        function startGame(type) {
+            state.game = type; state.lv = 1; state.qIdx = 0; state.triesInQuestion = 0; state.applesCollected = 0;
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            updateUI(); loadStage();
+        }
+
+        function updateUI() {
+            document.getElementById('total-score').innerText = state.totalScore;
+            document.getElementById('level-ui').innerText = state.lv;
+            document.getElementById('tries-ui').innerText = state.triesInQuestion;
+            document.getElementById('progress-bar').style.width = `${(state.qIdx / QUESTIONS_PER_LEVEL) * 100}%`;
+            localStorage.setItem('kid_score', state.totalScore);
+        }
+
+        function loadStage() {
+            const visual = document.getElementById('game-visual');
+            const options = document.getElementById('options-grid');
+            const matching = document.getElementById('matching-grid');
+            const qText = document.getElementById('q-text');
+
+            visual.innerHTML = ''; options.innerHTML = ''; matching.innerHTML = '';
+            matching.classList.add('hidden'); options.classList.remove('hidden');
+
+            if (state.game === 'matching') {
+                qText.innerText = "Nối từ Tiếng Anh với Tiếng Việt tương ứng";
+                options.classList.add('hidden'); matching.classList.remove('hidden');
+                setupMatching();
+            } else {
+                const currentData = DATA[state.game]?.[1];
+                const q = currentData[state.qIdx];
+                qText.innerText = q.q;
+                q.o.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = "bg-white/10 hover:bg-white/20 p-4 rounded-2xl font-bold text-lg text-white border-b-4 border-black/40 transition-all active:translate-y-1";
+                    btn.innerText = opt;
+                    btn.onclick = () => checkAnswer(opt, q.a);
+                    options.appendChild(btn);
+                });
+                renderGameVisual(visual);
+            }
+        }
+
+        function renderGameVisual(container) {
+            if (state.game === 'haaland') {
+                container.className = "premium-pitch";
+                container.innerHTML = `
+                    <div class="goal-net" id="goal"></div>
+                    <div id="neuer" class="neuer-pro">
+                        <svg viewBox="0 0 100 150" class="w-full h-full">
+                            <rect x="35" y="80" width="10" height="30" fill="#14532d" />
+                            <rect x="55" y="80" width="10" height="30" fill="#14532d" />
+                            <rect x="30" y="40" width="40" height="45" rx="4" fill="#22c55e" />
+                            <text x="50" y="55" text-anchor="middle" fill="#fff" font-size="8" font-weight="900">NEUER</text>
+                            <circle cx="25" cy="60" r="6" fill="#ef4444" /> <!-- Glove L -->
+                            <circle cx="75" cy="60" r="6" fill="#ef4444" /> <!-- Glove R -->
+                            <circle cx="50" cy="25" r="18" fill="#fde68a" />
+                        </svg>
+                    </div>
+                    <div id="player" class="haaland-pro bottom-6 left-6">
+                        <svg viewBox="0 0 100 150" class="w-full h-full">
+                            <rect x="35" y="80" width="10" height="30" fill="#fde68a" />
+                            <rect x="55" y="80" width="10" height="30" fill="#fde68a" />
+                            <rect x="30" y="40" width="40" height="45" rx="4" fill="#0ea5e9" />
+                            <text x="50" y="55" text-anchor="middle" fill="#fff" font-size="7" font-weight="900">HAALAND</text>
+                            <text x="50" y="75" text-anchor="middle" fill="#fff" font-weight="900" font-size="20">9</text>
+                            <circle cx="50" cy="25" r="18" fill="#fde68a" />
+                            <path d="M42 10 Q50 0 58 10" fill="#facc15" stroke="#854d0e" stroke-width="2" /> <!-- Bun -->
+                        </svg>
+                    </div>
+                    <div id="ball" class="absolute bottom-10 left-1/2 -translate-x-1/2 text-4xl transition-all duration-500 z-30">⚽</div>
+                    <div class="fan-zone"><span class="fan">👦</span><span class="fan" style="animation-delay:0.1s">👧</span><span class="fan" style="animation-delay:0.2s">👦</span><span class="fan" style="animation-delay:0.3s">👧</span></div>
+                `;
+            } else if (state.game === 'shooter') {
+                container.className = "bg-indigo-950 flex flex-col items-center justify-center";
+                container.innerHTML = `<div id="target" class="text-7xl mb-10 transition-all">🎯</div><div id="arrow" class="text-5xl absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0">🏹</div><div class="text-5xl">🏹</div>`;
+            } else if (state.game === 'falling') {
+                container.className = "bg-green-900 flex flex-col items-center justify-end pb-4";
+                let apples = ""; for(let i=0; i<state.applesCollected; i++) apples += "🍎";
+                container.innerHTML = `<div id="apple-anim" class="absolute top-4 text-6xl opacity-0">🍎</div><div id="basket" class="text-7xl relative">🧺<div class="absolute top-0 left-0 text-xl w-full text-center">${apples}</div></div>`;
+            } else if (state.game === 'tom') {
+                container.className = "bg-slate-800 relative";
+                container.innerHTML = `<div id="obstacle" class="absolute bottom-6 right-10 text-5xl">🚧</div><div id="tom-model" class="absolute bottom-6 left-[10%] text-7xl transition-all">🐱</div><div class="absolute top-4 right-4 text-6xl">🏠</div>`;
+            } else {
+                container.className = "bg-slate-900 flex items-center justify-center";
+                container.innerHTML = `<div class="text-6xl animate-pulse">📝</div>`;
+            }
+        }
+
+        function checkAnswer(selected, correct) {
+            const isCorrect = selected === correct;
+            document.querySelectorAll('#options-grid button').forEach(b => b.disabled = true);
+
+            if (isCorrect) {
+                state.triesInQuestion = 0; handleSuccess();
+            } else {
+                state.triesInQuestion++; updateUI();
+                if (state.triesInQuestion >= 2) handleFailure(true);
+                else handleFailure(false);
+            }
+        }
+
+        function handleSuccess() {
+            if (state.game === 'haaland') {
+                const player = document.getElementById('player');
+                const ball = document.getElementById('ball');
+                const neuer = document.getElementById('neuer');
+                player.classList.add('running');
+                player.style.left = "42%";
+                setTimeout(() => {
+                    player.classList.remove('running');
+                    const side = Math.random() > 0.5 ? 'left' : 'right';
+                    ball.style.transform = side === 'left' ? "translate(-60px, -180px) scale(0.5) rotate(720deg)" : "translate(60px, -180px) scale(0.5) rotate(720deg)";
+                    neuer.classList.add(side === 'left' ? 'dive-left' : 'dive-right');
+                    setTimeout(() => {
+                        document.getElementById('goal')?.classList.add('shake');
+                        showNoti("GOAL!", true);
+                        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                        setTimeout(next, 1500);
+                    }, 500);
+                }, 600);
+            } else if (state.game === 'shooter') {
+                const arrow = document.getElementById('arrow');
+                arrow.style.transition = "bottom 0.4s ease-in, opacity 0.2s";
+                arrow.style.bottom = "180px"; arrow.style.opacity = "1";
+                setTimeout(() => {
+                    arrow.style.opacity = "0";
+                    document.getElementById('target').style.transform = "scale(2)";
+                    document.getElementById('target').style.opacity = "0";
+                    confetti({ particleCount: 100, spread: 80, origin: { y: 0.4 } });
+                    setTimeout(next, 600);
+                }, 400);
+            } else if (state.game === 'falling') {
+                const apple = document.getElementById('apple-anim');
+                apple.style.transition = "top 0.6s ease-in, opacity 0.2s";
+                apple.style.top = "180px"; apple.style.opacity = "1";
+                setTimeout(() => { state.applesCollected++; next(); }, 600);
+            } else if (state.game === 'tom') {
+                const tom = document.getElementById('tom-model');
+                tom.style.transition = "all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+                tom.style.bottom = "120px"; tom.style.left = "40%";
+                setTimeout(() => { tom.style.bottom = "24px"; tom.style.left = "80%"; setTimeout(next, 400); }, 300);
+            } else { next(); }
+        }
+
+        function handleFailure(isGameOver) {
+            document.getElementById('game-visual').classList.add('shake');
+            setTimeout(() => {
+                document.getElementById('game-visual').classList.remove('shake');
+                if (isGameOver) showEnd(false);
+                else document.querySelectorAll('#options-grid button').forEach(b => b.disabled = false);
+            }, 400);
+        }
+
+        function showNoti(text, win) {
+            const el = document.getElementById('noti-layer');
+            document.getElementById('noti-text').innerText = text;
+            el.classList.remove('hidden');
+            setTimeout(() => el.classList.add('hidden'), 1500);
+        }
+
+        function next() {
+            state.totalScore += 20; state.qIdx++;
+            if (state.qIdx >= QUESTIONS_PER_LEVEL) {
+                state.qIdx = 0; state.lv++;
+                if (state.lv > 2) { showEnd(true); return; }
+            }
+            updateUI(); loadStage();
+        }
+
+        function showEnd(win) {
+            document.getElementById('modal-title').innerText = win ? "QUÁ XUẤT SẮC!" : "CỐ GẮNG LÊN!";
+            document.getElementById('modal-icon').innerText = win ? "👑" : "💪";
+            document.getElementById('modal-msg').innerText = win ? "Bé đã chinh phục thử thách thành công!" : "Không sao đâu, lần sau bé sẽ làm tốt hơn!";
+            document.getElementById('status-modal').classList.remove('hidden');
+        }
+
+        function setupMatching() {
+            const grid = document.getElementById('matching-grid'); grid.classList.remove('hidden');
+            const pool = MATCHING_POOLS[1]; let cards = [];
+            pool.forEach(p => { cards.push({ text: p.en, id: p.en }); cards.push({ text: p.vi, id: p.en }); });
+            cards.sort(() => Math.random() - 0.5);
+            cards.forEach(card => {
+                const div = document.createElement('div');
+                div.className = "bg-white/10 h-20 rounded-xl flex items-center justify-center cursor-pointer font-bold text-white p-2 text-center text-sm border-2 border-transparent transition-all";
+                div.innerText = card.text;
+                div.onclick = () => {
+                    if (div.classList.contains('bg-indigo-600')) return;
+                    div.classList.add('bg-indigo-600', 'border-indigo-400');
+                    state.matchingSelected.push({ el: div, card });
+                    if (state.matchingSelected.length === 2) {
+                        const [a, b] = state.matchingSelected;
+                        if (a.card.id === b.card.id) { confetti({ particleCount: 30 }); state.totalScore += 20; updateUI(); }
+                        else { setTimeout(() => { a.el.classList.remove('bg-indigo-600', 'border-indigo-400'); b.el.classList.remove('bg-indigo-600', 'border-indigo-400'); }, 400); }
+                        state.matchingSelected = [];
+                        if (document.querySelectorAll('.bg-indigo-600').length === pool.length * 2) setTimeout(next, 1000);
+                    }
+                };
+                grid.appendChild(div);
+            });
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>

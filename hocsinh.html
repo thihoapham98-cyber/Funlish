@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Elite Academy | English Mastery Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .sidebar-english { 
+            background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%); 
+        }
+        
+        /* Custom Scrollbar cho Sidebar */
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 10px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.6);
+        }
+
+        .premium-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .premium-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+            border-color: #6366f1;
+        }
+
+        .nav-item-active {
+            background: #6366f1 !important;
+            color: white !important;
+            box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.6);
+        }
+
+        .cefr-badge {
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .animate-pop-in {
+            animation: popIn 0.5s cubic-bezier(0.26, 0.53, 0.74, 1.48) forwards;
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Scrollbar chung cho Main Content */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .heatmap-cell {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+        }
+
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: #e2e8f0;
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .toggle-active { background: #6366f1; }
+        .toggle-circle {
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            transition: all 0.3s;
+        }
+        .toggle-active .toggle-circle { left: 23px; }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex">
+
+    <!-- SIDEBAR -->
+    <aside class="w-72 sidebar-english flex flex-col h-full shrink-0 shadow-2xl z-20">
+        <!-- Logo Header (Cố định) -->
+        <div class="p-8 pb-4">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg transform rotate-3">
+                    <i class="fas fa-language text-indigo-600 text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-white font-extrabold text-xl leading-none tracking-tight">E-Elite</h1>
+                    <p class="text-indigo-300 text-[10px] font-black uppercase tracking-[0.2em] mt-1">English Hub</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Navigation (Có thanh cuộn tùy chỉnh) -->
+        <div class="flex-1 overflow-y-auto px-8 sidebar-scroll">
+            <nav class="space-y-2 pb-8">
+                <p class="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 ml-4">Main Dashboard</p>
+                <button onclick="switchSection('analytics', this)" class="section-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-white nav-item-active transition-all text-sm font-bold text-left">
+                    <i class="fas fa-chart-pie w-5"></i> Phân tích trình độ
+                </button>
+                <button onclick="switchSection('directory', this)" class="section-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-400 hover:text-white transition-all text-sm font-bold text-left">
+                    <i class="fas fa-id-badge w-5"></i> Quản lý học viên
+                </button>
+                
+                <p class="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mt-8 mb-4 ml-4">Academic Care</p>
+                <button onclick="switchSection('behavior', this)" class="section-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-400 hover:text-white transition-all text-sm font-bold text-left">
+                    <i class="fas fa-medal w-5"></i> Huy chương & Kỷ luật
+                </button>
+                <button onclick="switchSection('access', this)" class="section-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-400 hover:text-white transition-all text-sm font-bold text-left">
+                    <i class="fas fa-bolt w-5"></i> Hoạt động App
+                </button>
+                
+                <p class="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mt-8 mb-4 ml-4">Exams & Resources</p>
+                <button onclick="switchSection('forecast', this)" class="section-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-400 hover:text-white transition-all text-sm font-bold text-left">
+                    <i class="fas fa-crystal-ball w-5"></i> Dự báo Cambridge
+                </button>
+                <button onclick="switchSection('resources', this)" class="section-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-400 hover:text-white transition-all text-sm font-bold text-left">
+                    <i class="fas fa-cloud-download-alt w-5"></i> Thư viện Exam
+                </button>
+
+                <p class="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mt-8 mb-4 ml-4">Support & Config</p>
+                <button onclick="switchSection('settings', this)" class="section-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-400 hover:text-white transition-all text-sm font-bold text-left">
+                    <i class="fas fa-cog w-5"></i> Cài đặt hệ thống
+                </button>
+                <button onclick="switchSection('help', this)" class="section-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-400 hover:text-white transition-all text-sm font-bold text-left">
+                    <i class="fas fa-question-circle w-5"></i> Trợ giúp & HDSD
+                </button>
+            </nav>
+        </div>
+        
+        <!-- Footer (Cố định) -->
+        <div class="p-8">
+            <div class="bg-indigo-500/10 rounded-3xl p-5 border border-indigo-500/20">
+                <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-3 text-center">Tình trạng hệ thống</p>
+                <div class="flex items-center justify-between mb-4">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-[10px] text-emerald-500 font-bold uppercase">Cloud Sync Active</span>
+                </div>
+                <button class="w-full py-2 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-900/40">Gửi báo cáo</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col min-w-0 relative">
+        <!-- HEADER -->
+        <header class="h-20 px-10 flex items-center justify-between bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-10">
+            <div>
+                <h2 id="sectionTitle" class="text-xl font-black text-slate-900 tracking-tight">Phân tích trình độ học thuật</h2>
+                <p id="sectionSubTitle" class="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-widest">Khối lớp 5 - Chương trình tăng cường IELTS/Cambridge</p>
+            </div>
+            
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex items-center gap-2 bg-slate-100 px-4 py-2 rounded-2xl border border-slate-200 focus-within:border-indigo-500 transition-all">
+                    <i class="fas fa-search text-slate-400 text-xs"></i>
+                    <input type="text" placeholder="Tìm kiếm nhanh..." class="bg-transparent border-none outline-none text-xs font-bold w-48">
+                </div>
+                <div class="flex items-center gap-3 pl-6 border-l border-slate-200">
+                    <div class="text-right">
+                        <p class="text-xs font-black">Ms. Helen Nguyen</p>
+                        <p class="text-[9px] text-indigo-500 font-black uppercase">Head of English</p>
+                    </div>
+                    <img src="https://ui-avatars.com/api/?name=Helen+Nguyen&background=6366f1&color=fff" class="w-10 h-10 rounded-2xl shadow-md border-2 border-white" />
+                </div>
+            </div>
+        </header>
+
+        <div id="mainViewport" class="flex-1 overflow-y-auto p-10 space-y-10">
+            
+            <!-- SECTION: ANALYTICS -->
+            <div id="sec-analytics" class="animate-pop-in space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="premium-card p-6 bg-indigo-600 text-white">
+                        <p class="text-[10px] font-bold uppercase opacity-80 tracking-widest">Average Proficiency</p>
+                        <h3 class="text-3xl font-black mt-2">B1.2</h3>
+                        <p class="text-[11px] mt-2 font-medium">Tương đương 4.5 - 5.0 IELTS</p>
+                    </div>
+                    <div class="premium-card p-6">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Vocabulary Range</p>
+                        <h3 class="text-3xl font-black mt-2 text-slate-800">2,450</h3>
+                        <p class="text-[11px] mt-2 font-bold text-emerald-500"><i class="fas fa-arrow-up mr-1"></i> +120 words/month</p>
+                    </div>
+                    <div class="premium-card p-6">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Grammar Accuracy</p>
+                        <h3 class="text-3xl font-black mt-2 text-slate-800">78%</h3>
+                        <div class="w-full bg-slate-100 h-1.5 rounded-full mt-3">
+                            <div class="bg-indigo-500 h-full rounded-full" style="width: 78%"></div>
+                        </div>
+                    </div>
+                    <div class="premium-card p-6">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Fluency Score</p>
+                        <h3 class="text-3xl font-black mt-2 text-slate-800">8.2/10</h3>
+                        <p class="text-[11px] mt-2 font-bold text-slate-400 italic">Dựa trên AI Speaking Lab</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="premium-card p-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <h4 class="font-black text-lg">Phân tích kỹ năng cốt lõi (Radar)</h4>
+                        </div>
+                        <div class="h-80 flex items-center justify-center">
+                            <canvas id="skillsRadarChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="premium-card p-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <h4 class="font-black text-lg">Ma trận trình độ (CEFR)</h4>
+                            <span class="bg-slate-100 px-3 py-1 rounded-full text-[10px] font-black text-slate-500">Toàn khối</span>
+                        </div>
+                        <div class="space-y-6">
+                            <div>
+                                <div class="flex justify-between text-[11px] font-bold mb-2"><span>Pre-A1 / Starters</span><span class="text-slate-400">12 (8%)</span></div>
+                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden"><div class="bg-slate-300 h-full w-[8%]"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[11px] font-bold mb-2"><span>A1 / Movers</span><span class="text-slate-400">38 (26%)</span></div>
+                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden"><div class="bg-amber-400 h-full w-[26%]"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[11px] font-bold mb-2"><span>A2 / Flyers</span><span class="text-slate-400">65 (45%)</span></div>
+                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden"><div class="bg-indigo-500 h-full w-[45%]"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[11px] font-bold mb-2"><span>B1 / KET-PET</span><span class="text-indigo-600">27 (21%)</span></div>
+                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden"><div class="bg-emerald-500 h-full w-[21%]"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: DIRECTORY -->
+            <div id="sec-directory" class="hidden animate-pop-in space-y-8">
+                <div class="premium-card overflow-hidden">
+                    <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-white">
+                        <h3 class="font-black text-lg">Danh sách học viên Master</h3>
+                        <button class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-xs font-extrabold uppercase">Thêm mới</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="bg-slate-50/50">
+                                    <th class="py-5 px-8 text-[10px] font-black text-slate-400 uppercase">Học viên</th>
+                                    <th class="py-5 px-6 text-[10px] font-black text-slate-400 uppercase">Kỹ năng</th>
+                                    <th class="py-5 px-6 text-[10px] font-black text-slate-400 uppercase">Điểm TB</th>
+                                    <th class="py-5 px-6 text-[10px] font-black text-slate-400 uppercase">Thái độ</th>
+                                    <th class="py-5 px-8 text-[10px] font-black text-slate-400 uppercase text-right">Chi tiết</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentListBody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: BEHAVIOR -->
+            <div id="sec-behavior" class="hidden animate-pop-in space-y-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 premium-card p-8">
+                        <h4 class="text-xl font-black mb-6">Top Học viên Tiêu biểu</h4>
+                        <div id="behaviorList" class="space-y-4"></div>
+                    </div>
+                    <div class="premium-card p-8 bg-indigo-600 text-white border-none flex flex-col">
+                        <h4 class="text-xl font-black mb-6">Lịch sử Điểm thưởng</h4>
+                        <div class="space-y-6 overflow-y-auto max-h-[300px] pr-2 sidebar-scroll">
+                            <div class="flex gap-4 border-l-2 border-white/20 pl-4 py-1">
+                                <div class="flex-1"><p class="text-xs font-bold">Thưởng bài viết hay</p><p class="text-[10px] opacity-60">Lớp 5A - Project</p></div>
+                                <span class="text-xs font-black">+50pts</span>
+                            </div>
+                            <div class="flex gap-4 border-l-2 border-white/20 pl-4 py-1">
+                                <div class="flex-1"><p class="text-xs font-bold">Hỗ trợ bạn học</p><p class="text-[10px] opacity-60">Hướng dẫn bạn mới</p></div>
+                                <span class="text-xs font-black">+100pts</span>
+                            </div>
+                            <div class="flex gap-4 border-l-2 border-rose-400 pl-4 py-1">
+                                <div class="flex-1"><p class="text-xs font-bold text-rose-200">Nộp bài muộn</p><p class="text-[10px] opacity-60">Unit 4 Test</p></div>
+                                <span class="text-xs font-black text-rose-200">-20pts</span>
+                            </div>
+                        </div>
+                        <button class="w-full mt-auto py-3 bg-white text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-widest">Cấp huy chương</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: ACCESS -->
+            <div id="sec-access" class="hidden animate-pop-in space-y-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 space-y-8">
+                        <div class="premium-card p-8">
+                            <h4 class="text-xl font-black mb-6">Lưu lượng truy cập hệ thống</h4>
+                            <div class="h-64"><canvas id="usageLineChart"></canvas></div>
+                        </div>
+                        <div class="premium-card p-8">
+                            <h4 class="text-xl font-black mb-6">Mật độ học tập (Heatmap)</h4>
+                            <div class="grid grid-cols-7 gap-2" id="heatmapGrid"></div>
+                        </div>
+                    </div>
+                    <div class="premium-card p-8 flex flex-col">
+                        <h4 class="text-xl font-black mb-6">Phiên làm việc gần đây</h4>
+                        <div class="space-y-6" id="sessionLog"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: FORECAST -->
+            <div id="sec-forecast" class="hidden animate-pop-in space-y-10">
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <div class="premium-card p-6 bg-emerald-500 text-white text-center"><p class="text-[10px] font-bold opacity-80 uppercase">Starters Ready</p><h3 class="text-3xl font-black mt-1">94%</h3></div>
+                    <div class="premium-card p-6 bg-indigo-50 text-indigo-600 text-center border-indigo-200"><p class="text-[10px] font-bold opacity-80 uppercase">Movers Ready</p><h3 class="text-3xl font-black mt-1">72%</h3></div>
+                    <div class="premium-card p-6 bg-amber-500 text-white text-center"><p class="text-[10px] font-bold opacity-80 uppercase">Flyers Ready</p><h3 class="text-3xl font-black mt-1">45%</h3></div>
+                    <div class="premium-card p-6 bg-slate-800 text-white text-center"><p class="text-[10px] font-bold opacity-80 uppercase">Avg Shields</p><h3 class="text-3xl font-black mt-1">13.5</h3></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="premium-card p-8">
+                        <h4 class="text-xl font-black mb-8">Chi tiết "Khiên" dự kiến (Skills Shield)</h4>
+                        <div class="h-80"><canvas id="forecastShieldsChart"></canvas></div>
+                    </div>
+                    <div class="premium-card p-8">
+                        <h4 class="text-xl font-black mb-6">Đề xuất kỳ thi (Q2/2026)</h4>
+                        <div class="space-y-4" id="examSuggestions"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: RESOURCES -->
+            <div id="sec-resources" class="hidden animate-pop-in space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="resourceList"></div>
+            </div>
+
+            <!-- SECTION: SETTINGS -->
+            <div id="sec-settings" class="hidden animate-pop-in space-y-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="premium-card p-8">
+                            <h4 class="text-xl font-black mb-8 flex items-center gap-3">
+                                <i class="fas fa-sliders-h text-indigo-600"></i> Cấu hình chung
+                            </h4>
+                            <div class="space-y-6">
+                                <div class="flex items-center justify-between py-4 border-b border-slate-50">
+                                    <div><p class="font-black text-sm">Chế độ tối (Dark Mode)</p><p class="text-[11px] text-slate-400">Tự động chuyển đổi giao diện theo hệ điều hành</p></div>
+                                    <div onclick="this.classList.toggle('toggle-active')" class="toggle-switch"><div class="toggle-circle"></div></div>
+                                </div>
+                                <div class="flex items-center justify-between py-4 border-b border-slate-50">
+                                    <div><p class="font-black text-sm">Thông báo tức thời</p><p class="text-[11px] text-slate-400">Nhận thông báo khi học viên nộp bài tập mới</p></div>
+                                    <div onclick="this.classList.toggle('toggle-active')" class="toggle-switch toggle-active"><div class="toggle-circle"></div></div>
+                                </div>
+                                <div class="flex items-center justify-between py-4">
+                                    <div><p class="font-black text-sm">Tự động sao lưu</p><p class="text-[11px] text-slate-400">Đồng bộ dữ liệu lên Cloud sau mỗi 15 phút</p></div>
+                                    <div onclick="this.classList.toggle('toggle-active')" class="toggle-switch toggle-active"><div class="toggle-circle"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="premium-card p-8">
+                            <h4 class="text-xl font-black mb-8 flex items-center gap-3 text-rose-600">
+                                <i class="fas fa-shield-alt"></i> Quyền riêng tư & Bảo mật
+                            </h4>
+                            <button class="w-full flex items-center justify-between p-4 bg-slate-50 rounded-2xl mb-4 hover:bg-slate-100 transition-all">
+                                <span class="text-sm font-bold">Thay đổi mật khẩu tài khoản</span>
+                                <i class="fas fa-chevron-right text-slate-300"></i>
+                            </button>
+                            <button class="w-full flex items-center justify-between p-4 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-all">
+                                <span class="text-sm font-bold">Quản lý phiên đăng nhập</span>
+                                <i class="fas fa-chevron-right text-slate-300"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="premium-card p-8 text-center bg-indigo-50 border-indigo-100">
+                            <div class="w-20 h-20 bg-white rounded-full mx-auto flex items-center justify-center shadow-lg border-4 border-white mb-4 relative">
+                                <img src="https://ui-avatars.com/api/?name=Helen+Nguyen&background=6366f1&color=fff" class="rounded-full w-full h-full" />
+                                <div class="absolute bottom-0 right-0 w-6 h-6 bg-emerald-500 border-2 border-white rounded-full"></div>
+                            </div>
+                            <h5 class="font-black text-slate-800">Helen Nguyen</h5>
+                            <p class="text-[11px] text-slate-500 font-bold mb-6">Giáo viên quản nhiệm khối 5</p>
+                            <button class="w-full py-3 bg-white text-indigo-600 border border-indigo-200 rounded-xl text-[11px] font-black uppercase hover:bg-indigo-600 hover:text-white transition-all">Chỉnh sửa hồ sơ</button>
+                        </div>
+                        <div class="premium-card p-8">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Phiên bản hệ thống</p>
+                            <div class="flex justify-between items-center text-sm mb-2"><span class="text-slate-500">Bản dựng:</span><span class="font-bold">v2.5.4-Stable</span></div>
+                            <div class="flex justify-between items-center text-sm"><span class="text-slate-500">Lần cuối:</span><span class="font-bold">Hôm nay, 14:20</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: HELP -->
+            <div id="sec-help" class="hidden animate-pop-in space-y-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <h4 class="text-2xl font-black mb-2">Trung tâm trợ giúp</h4>
+                        <p class="text-slate-500 text-sm mb-8">Tìm kiếm câu trả lời nhanh hoặc liên hệ với đội ngũ kỹ thuật của E-Elite Academy.</p>
+                        
+                        <div class="premium-card p-6 cursor-pointer group">
+                            <div class="flex items-center justify-between">
+                                <h5 class="font-bold text-slate-800">Làm thế nào để xuất báo cáo PDF?</h5>
+                                <i class="fas fa-plus text-slate-300 group-hover:text-indigo-600 transition-all"></i>
+                            </div>
+                        </div>
+                        <div class="premium-card p-6 cursor-pointer group">
+                            <div class="flex items-center justify-between">
+                                <h5 class="font-bold text-slate-800">Cách tính điểm CEFR cho học viên mới?</h5>
+                                <i class="fas fa-plus text-slate-300 group-hover:text-indigo-600 transition-all"></i>
+                            </div>
+                        </div>
+                        <div class="premium-card p-6 cursor-pointer group">
+                            <div class="flex items-center justify-between">
+                                <h5 class="font-bold text-slate-800">Khôi phục dữ liệu đã xóa nhầm?</h5>
+                                <i class="fas fa-plus text-slate-300 group-hover:text-indigo-600 transition-all"></i>
+                            </div>
+                        </div>
+                        <div class="premium-card p-6 cursor-pointer group border-indigo-200 bg-indigo-50/30">
+                            <div class="flex items-center justify-between">
+                                <h5 class="font-bold text-indigo-700">Tài liệu HDSD cho giáo viên (.PDF)</h5>
+                                <i class="fas fa-download text-indigo-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="premium-card p-8 bg-indigo-600 text-white border-none">
+                        <h4 class="text-xl font-black mb-6">Liên hệ hỗ trợ 24/7</h4>
+                        <div class="space-y-8">
+                            <div class="flex gap-6">
+                                <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-xl"><i class="fas fa-headset"></i></div>
+                                <div><p class="font-black">Hotline Kỹ thuật</p><p class="text-indigo-200 text-sm">1900 8888 (Nhấn phím 2)</p></div>
+                            </div>
+                            <div class="flex gap-6">
+                                <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-xl"><i class="fas fa-envelope-open-text"></i></div>
+                                <div><p class="font-black">Email hỗ trợ</p><p class="text-indigo-200 text-sm">support@e-elite.edu.vn</p></div>
+                            </div>
+                            <div class="pt-8 border-t border-white/10">
+                                <p class="text-xs font-bold text-indigo-200 mb-4 uppercase tracking-widest">Gửi yêu cầu nhanh</p>
+                                <textarea placeholder="Mô tả lỗi hoặc thắc mắc của bạn..." class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-sm placeholder:text-white/40 focus:outline-none focus:bg-white/20 h-32 mb-4"></textarea>
+                                <button class="w-full py-4 bg-white text-indigo-600 rounded-2xl font-black uppercase text-xs shadow-xl">Gửi ticket hỗ trợ</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const students = [
+            { id: 'EEL-01', name: 'Nguyễn Minh Khôi', cefr: 'B1', gpa: 9.4, class: '5A', skills: [90, 85, 95, 80, 88], behavior: 'Excellent' },
+            { id: 'EEL-02', name: 'Trần Bảo Vy', cefr: 'A2', gpa: 8.2, class: '5B', skills: [70, 80, 75, 85, 78], behavior: 'Good' },
+            { id: 'EEL-03', name: 'Lê Hoàng Long', cefr: 'A1', gpa: 6.8, class: '5A', skills: [50, 60, 45, 70, 55], behavior: 'Disruptive' },
+            { id: 'EEL-04', name: 'Phạm Gia Linh', cefr: 'A2', gpa: 7.9, class: '5C', skills: [82, 75, 70, 72, 80], behavior: 'Neutral' },
+            { id: 'EEL-05', name: 'Vũ Quốc Anh', cefr: 'B1', gpa: 9.8, class: '5B', skills: [98, 95, 99, 92, 96], behavior: 'Excellent' }
+        ];
+
+        let charts = {};
+
+        function switchSection(secId, btnEl) {
+            document.querySelectorAll('[id^="sec-"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById('sec-' + secId).classList.remove('hidden');
+            
+            document.querySelectorAll('.section-btn').forEach(btn => {
+                btn.classList.remove('nav-item-active', 'text-white');
+                btn.classList.add('text-slate-400');
+            });
+            btnEl.classList.add('nav-item-active', 'text-white');
+            btnEl.classList.remove('text-slate-400');
+
+            const titles = {
+                'analytics': 'Phân tích trình độ học thuật',
+                'directory': 'Quản lý học viên Tiếng Anh',
+                'behavior': 'Huy chương & Kỷ luật rèn luyện',
+                'access': 'Nhật ký Hoạt động App',
+                'forecast': 'Dự báo Cambridge Results',
+                'resources': 'Thư viện Exam Resource',
+                'settings': 'Cài đặt hệ thống',
+                'help': 'Trợ giúp & Hướng dẫn'
+            };
+            document.getElementById('sectionTitle').innerText = titles[secId];
+            
+            // Re-init charts if visible
+            if(secId === 'analytics') setTimeout(initAnalyticsCharts, 50);
+            if(secId === 'access') { setTimeout(initUsageChart, 50); renderHeatmap(); }
+            if(secId === 'forecast') setTimeout(initForecastChart, 50);
+        }
+
+        function initAnalyticsCharts() {
+            const ctx = document.getElementById('skillsRadarChart')?.getContext('2d');
+            if (!ctx) return;
+            if(charts.radar) charts.radar.destroy();
+            charts.radar = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Listening', 'Reading', 'Writing', 'Speaking', 'Grammar'],
+                    datasets: [{
+                        label: 'Điểm TB Khối 5',
+                        data: [82, 75, 68, 85, 72],
+                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                        borderColor: '#6366f1',
+                        pointBackgroundColor: '#6366f1'
+                    }]
+                },
+                options: { maintainAspectRatio: false }
+            });
+        }
+
+        function initUsageChart() {
+            const ctx = document.getElementById('usageLineChart')?.getContext('2d');
+            if(!ctx) return;
+            if(charts.usage) charts.usage.destroy();
+            charts.usage = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                    datasets: [{
+                        label: 'Lượt học tập',
+                        data: [120, 150, 140, 210, 180, 280, 250],
+                        borderColor: '#6366f1',
+                        fill: true,
+                        backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                        tension: 0.4
+                    }]
+                },
+                options: { maintainAspectRatio: false }
+            });
+        }
+
+        function initForecastChart() {
+            const ctx = document.getElementById('forecastShieldsChart')?.getContext('2d');
+            if(!ctx) return;
+            if(charts.forecast) charts.forecast.destroy();
+            charts.forecast = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Listening', 'Reading', 'Writing', 'Speaking'],
+                    datasets: [{
+                        label: 'Số Khiên (Shields)',
+                        data: [4.8, 4.2, 3.8, 4.9],
+                        backgroundColor: ['#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe'],
+                        borderRadius: 12
+                    }]
+                },
+                options: { 
+                    maintainAspectRatio: false,
+                    scales: { y: { min: 0, max: 5 } }
+                }
+            });
+        }
+
+        function renderHeatmap() {
+            const grid = document.getElementById('heatmapGrid');
+            if(!grid) return;
+            grid.innerHTML = Array.from({length: 42}).map(() => {
+                const intensity = Math.random();
+                let color = 'bg-slate-100';
+                if(intensity > 0.8) color = 'bg-indigo-600';
+                else if(intensity > 0.5) color = 'bg-indigo-400';
+                else if(intensity > 0.2) color = 'bg-indigo-200';
+                return `<div class="heatmap-cell ${color}"></div>`;
+            }).join('');
+        }
+
+        function renderData() {
+            // Students
+            document.getElementById('studentListBody').innerHTML = students.map(s => `
+                <tr class="hover:bg-slate-50 transition-all cursor-pointer">
+                    <td class="py-5 px-8">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-xs">${s.name.charAt(0)}</div>
+                            <div><p class="text-sm font-black text-slate-800">${s.name}</p><span class="cefr-badge bg-indigo-100 text-indigo-700">${s.cefr}</span></div>
+                        </div>
+                    </td>
+                    <td class="py-5 px-6"><div class="flex gap-1">${s.skills.map(sk => `<div class="w-1.5 h-4 rounded-full ${sk > 80 ? 'bg-indigo-500' : 'bg-slate-200'}"></div>`).join('')}</div></td>
+                    <td class="py-5 px-6 font-black text-slate-800">${s.gpa}</td>
+                    <td class="py-5 px-6"><span class="text-[9px] font-black uppercase px-2 py-1 rounded-md bg-slate-100 text-slate-500">${s.behavior}</span></td>
+                    <td class="py-5 px-8 text-right"><i class="fas fa-chevron-right text-slate-200"></i></td>
+                </tr>
+            `).join('');
+
+            // Behavior
+            document.getElementById('behaviorList').innerHTML = `
+                <div class="flex items-center justify-between p-4 bg-amber-50 rounded-2xl border border-amber-100">
+                    <div class="flex items-center gap-4"><div class="w-12 h-12 bg-amber-400 text-white rounded-xl flex items-center justify-center font-black">1</div><div><p class="font-black">Dương Minh Tâm</p><p class="text-[10px] text-amber-600 font-bold uppercase">Huy chương vàng chuyên cần</p></div></div>
+                    <div class="text-right"><p class="text-lg font-black text-amber-600">+1,250</p></div>
+                </div>
+                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div class="flex items-center gap-4"><div class="w-12 h-12 bg-slate-300 text-white rounded-xl flex items-center justify-center font-black">2</div><div><p class="font-black">Lê Hoàng Long</p><p class="text-[10px] text-slate-500 font-bold uppercase">Sáng tạo Speaking</p></div></div>
+                    <div class="text-right"><p class="text-lg font-black text-slate-600">+1,120</p></div>
+                </div>
+            `;
+
+            // Sessions
+            document.getElementById('sessionLog').innerHTML = `
+                <div class="flex items-center gap-4"><div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center"><i class="fas fa-mobile-alt"></i></div><div><p class="text-xs font-black">Mobile - Vy Vy</p><p class="text-[10px] text-slate-400">12 phút trước</p></div></div>
+                <div class="flex items-center gap-4 mt-6"><div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center"><i class="fas fa-desktop"></i></div><div><p class="text-xs font-black">Web - Minh Khoi</p><p class="text-[10px] text-slate-400">45 phút trước</p></div></div>
+            `;
+
+            // Resources
+            document.getElementById('resourceList').innerHTML = [
+                {title: 'Flyers Mock Test', type: 'rose', icon: 'file-pdf'},
+                {title: 'Speaking Tips', type: 'sky', icon: 'video'},
+                {title: 'New Request', type: 'slate', icon: 'plus'}
+            ].map(r => `
+                <div class="premium-card p-6 flex flex-col group bg-white">
+                    <div class="w-12 h-12 bg-${r.type}-50 text-${r.type}-600 rounded-2xl flex items-center justify-center text-xl mb-4"><i class="fas fa-${r.icon}"></i></div>
+                    <h5 class="font-black text-slate-800">${r.title}</h5>
+                    <div class="mt-auto pt-6 flex items-center justify-between"><button class="text-indigo-600 font-black text-[10px] uppercase">Xem thêm</button></div>
+                </div>
+            `).join('');
+
+            // Exams
+            document.getElementById('examSuggestions').innerHTML = `
+                <div class="p-4 border border-slate-100 rounded-2xl flex items-center justify-between"><div><p class="text-sm font-black">Cụm thi Quận 1</p><p class="text-[10px] text-slate-400 font-bold uppercase">15/05/2026</p></div><span class="bg-indigo-50 text-indigo-600 text-[10px] font-black px-3 py-1 rounded-full">32 Slot</span></div>
+                <div class="p-4 border border-slate-100 rounded-2xl flex items-center justify-between"><div><p class="text-sm font-black">British Council</p><p class="text-[10px] text-slate-400 font-bold uppercase">20/06/2026</p></div><span class="bg-indigo-50 text-indigo-600 text-[10px] font-black px-3 py-1 rounded-full">12 Slot</span></div>
+            `;
+        }
+
+        window.onload = () => { renderData(); initAnalyticsCharts(); };
+    </script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Elite Academy - Hệ Sinh Thái Giáo Dục Tiếng Anh Toàn Diện</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css-files/home.css">
+</head>
+<body class="bg-slate-50 text-slate-900">
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-nav">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <div class="w-10 h-10 bg-white-600 rounded-lg flex items-center justify-center text-white">
+                        <img src="images/logo.png">
+                    </div>
+                    <span class="text-2xl font-bold tracking-tight text-blue-900">Funlish</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8 font-medium">
+                    <a href="index.html" data-lang="home" class="hover:text-blue-600 transition">Trang chủ </a>
+                    <a href="diendan.html" data-lang="danh_sach_khoa_hoc" class="hover:text-blue-600 transition">Khoá học</a>
+                    <a href="masonchat.html" data-lang="mason_ai" class="hover:text-blue-600 transition">Funlish AI</a>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <!-- Language Switcher -->
+                    <div class="bg-slate-100 p-1 rounded-full flex gap-1">
+                        <button onclick="setLanguage('vi')" id="lang-vi" class="lang-btn active">VN</button>
+                        <button onclick="setLanguage('en')" id="lang-en" class="lang-btn">EN</button>
+                    </div>
+                    <button onclick="openRegisterModal('Tư vấn tổng quát')" data-lang="free_consultation" class="bg-purple-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-purple-700 transition shadow-lg shadow-black-200">
+                        Tư vấn miễn phí
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Courses Section -->
+    <section id="courses" class="py-24 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4" data-lang=training_directory>Danh mục đào tạo</h2>
+                <div class="w-24 h-1 bg-blue-600 mx-auto"></div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Course 1 -->
+                <div class="course-card bg-white rounded-3xl overflow-hidden border border-slate-100 transition duration-300 flex flex-col">
+                    <img src="images/english.png" class="w-full h-48 object-cover">
+                    <div class="p-8 flex-1 flex flex-col">
+                        <h3 class="text-2xl font-bold mb-3">Beginner Level</h3>
+                        <p class="text-slate-600 mb-6 text-sm flex-1" data-lang="description_beginner_level">Luyện tập 3 kỹ năng</p>
+                        <div class="pt-6 border-t border-slate-100 flex items-center justify-between">
+                            <a href="beginnerlevel.html" class="bg-purple-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-blue-700 transition" data-lang-vi="Tham gia" data-lang-en="Join">Tham gia</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card bg-white rounded-3xl overflow-hidden border border-slate-100 transition duration-300 flex flex-col">
+                    <img src="images/advance.png" class="w-full h-48 object-cover">
+                    <div class="p-8 flex-1 flex flex-col">
+                        <h3 class="text-2xl font-bold mb-3">Advance Level</h3>
+                        <p class="text-slate-600 mb-6 text-sm flex-1" data-lang="description_advance_level">Luyện tập nâng cao 3 kỹ năng</p>
+                        <div class="pt-6 border-t border-slate-100 flex items-center justify-between">
+                            <a href="beginnerlevel.html" class="bg-purple-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-blue-700 transition" data-lang-vi="Tham gia" data-lang-en="Join">Tham gia</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card bg-white rounded-3xl overflow-hidden border border-slate-100 transition duration-300 flex flex-col">
+                    <img src="images/speaking.png" class="w-full h-48 object-cover">
+                    <div class="p-8 flex-1 flex flex-col">
+                        <h3 class="text-2xl font-bold mb-3">Speaking</h3>
+                        <p class="text-slate-600 mb-6 text-sm flex-1" data-lang="description_speaking_level">Luyện nói lưu loát</p>
+                        <div class="pt-6 border-t border-slate-100 flex items-center justify-between">
+                            <a href="beginnerlevel.html" class="bg-purple-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-blue-700 transition" data-lang-vi="Tham gia" data-lang-en="Join">Tham gia</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-purple-900 text-white pt-20 pb-10">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-12 mb-16">
+                <div class="col-span-2">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="w-10 h-10 bg-purple rounded-lg flex items-center justify-center text-white">
+                            <img src="images/logo.png">
+                        </div>
+                        <span class="text-2xl font-bold tracking-tight uppercase">Funlish</span>
+                    </div>
+                    <p class="text-white-400 max-w-sm mb-6" data-lang="footer_content_funlish">
+                        Nền tảng học tiếng Anh trực tuyến giúp mọi người học vui, hiểu nhanh và tự tin sử dụng ngôn ngữ mỗi ngày.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="https://www.facebook.com" class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.youtube.com/" class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h5 class="text-lg font-bold mb-6" data-lang="footer_information">Thông tin</h5>
+                    <ul class="space-y-4 text-slate-100">
+                        <li><button onclick="openContentModal('about')" class="hover:text-green-500 transition" data-lang="footer_about_us">Về chúng tôi</button></li>
+                        <li><button onclick="openContentModal('tuyendung')" class="hover:text-green-500 transition" data-lang="footer_careers">Tuyển dụng</button></li>
+                        <li><button onclick="openContentModal('tintuc')" class="hover:text-green-500 transition" data-lang="footer_news">Tin tức</button></li>
+                        <li><button onclick="openContentModal('chinhsach')" class="hover:text-green-500 transition" data-lang="footer_policies_regulations">Chính sách & Quy định</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="text-lg font-bold mb-6" data-lang="footer_contact">Liên hệ</h5>
+                    <ul class="space-y-4 text-slate-100 text-sm">
+                        <li class="flex gap-3"><i class="fas fa-map-marker-alt text-white-500 mt-1"></i> <span data-lang-vi="Quận Đống Đa, Hà Nội, Việt Nam" data-lang-en="Dong Da District, Hanoi, Vietnam">Quận Đống Đa, Hà Nội, Việt Nam</span></li>
+                        <li class="flex gap-3"><i class="fas fa-phone-alt text-white-500 mt-1"></i> 1900 6789</li>
+                        <li class="flex gap-3 truncate"><i class="fas fa-envelope text-white-500 mt-1"></i> funlish@gmail.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-white pt-8 text-center text-slate-200 text-sm" data-lang="footer_end">
+                <p>&copy; 
+                    2026 Funlish Academy. Một dự án của lớp tiến sĩ Lê Thanh Huyền | Founded by Group 12.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    // Language config
+    <script src="scripts/data-language-configs/listcourse-language-config.js"></script>
+    <script src="scripts/data-language-configs/home-language-config.js"></script>
+
+    // Multi-language Logic
+    <script src="scripts/listcourse/listcourse-language-switch.js"></script>
+</body>
+</html>

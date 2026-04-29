@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Elite Academy | Hệ Thống Quản Lý & Hỗ Trợ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        .sidebar-premium { background: #020617; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 1);
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            box-shadow: 0 4px 15px -2px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(79, 70, 229, 0.1) 0%, rgba(79, 70, 229, 0) 100%);
+            border-left: 4px solid #6366f1;
+            color: #fff;
+        }
+
+        .hidden-section { display: none; }
+        .active-section { display: block; animation: slideUp 0.4s ease-out; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        #notification-box {
+            transform-origin: top right;
+            transition: all 0.3s ease;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex">
+
+    <!-- Toast UI -->
+    <div id="toast" class="fixed bottom-8 right-8 z-[300] translate-y-[200%] transition-transform duration-300">
+        <div class="bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-white/10">
+            <div id="toast-icon" class="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-xs">
+                <i class="fas fa-check"></i>
+            </div>
+            <p id="toast-msg" class="text-sm font-bold">Thao tác thành công!</p>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="w-72 sidebar-premium flex flex-col h-full shrink-0">
+        <div class="p-8">
+            <div class="flex items-center gap-4 mb-10">
+                <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-rocket text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-white font-extrabold text-xl">E-Elite</h1>
+                    <p class="text-indigo-400 text-[10px] font-black uppercase tracking-widest">Kids Academy</p>
+                </div>
+            </div>
+
+            <nav class="space-y-2">
+                <!-- Sử dụng href để chuyển file -->
+                <a href="index.html" id="btn-tongquan" class="nav-item active w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-400 hover:text-white transition-all">
+                    <i class="fas fa-chart-pie"></i>
+                    <span class="text-sm font-bold">Tổng quan</span>
+                </a>
+                <a href="lophoc.html" id="btn-lophoc" class="nav-item w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-400 hover:text-white transition-all">
+                    <i class="fas fa-school"></i>
+                    <span class="text-sm font-bold"> Quản lý lớp học</span>
+                </a>
+                <a href="hocsinh.html" id="btn-hocsinh" class="nav-item w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-400 hover:text-white transition-all">
+                    <i class="fas fa-child"></i>
+                    <span class="text-sm font-bold"> Quản lý học sinh </span>
+                </a>
+                <a href="tailieu.html" id="btn-tailieu" class="nav-item w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-400 hover:text-white transition-all">
+                    <i class="fas fa-folder-open"></i>
+                    <span class="text-sm font-bold">Kho tài liệu</span>
+                </a>
+                
+                <div class="py-4 border-b border-white/5 mx-6"></div>
+                
+                <!-- Giữ nguyên các phần quản lý nội bộ trang nếu cần -->
+                <button onclick="showSection('caidat')" id="btn-caidat" class="nav-item w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-400 hover:text-white transition-all">
+                    <i class="fas fa-user-gear"></i>
+                    <span class="text-sm font-bold">Hồ sơ & Đội ngũ</span>
+                </button>
+                <button onclick="showSection('baotri')" id="btn-baotri" class="nav-item w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-rose-400 hover:bg-rose-500/10 transition-all">
+                    <i class="fas fa-bug"></i>
+                    <span class="text-sm font-bold">Báo lỗi kĩ thuật</span>
+                </button>
+            </nav>
+        </div>
+
+        <div class="mt-auto p-6">
+            <div class="bg-white/5 rounded-3xl p-5 border border-white/10">
+                <div class="flex items-center gap-4">
+                    <img id="side-avatar" src="https://ui-avatars.com/api/?name=Sean+Eom&background=6366f1&color=fff" class="w-12 h-12 rounded-2xl">
+                    <div class="overflow-hidden">
+                        <p id="side-name" class="text-white font-bold text-sm truncate">Mr. Sean Eom</p>
+                        <p id="side-role" class="text-slate-500 text-[10px] font-bold uppercase">Academic Manager</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col min-w-0">
+        <!-- Header -->
+        <header class="h-20 px-10 flex items-center justify-between bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
+            <div class="flex items-center gap-4">
+                <h2 id="page-title" class="text-xl font-black text-slate-900">Tổng quan</h2>
+                <span class="bg-indigo-50 text-indigo-600 text-[10px] font-black px-3 py-1 rounded-full uppercase">Hệ thống quản trị học thuật</span>
+            </div>
+            
+            <div class="flex items-center gap-6">
+                <div class="flex flex-col items-end">
+                    <p id="clock" class="text-sm font-black text-slate-900">00:00:00</p>
+                    <p class="text-[9px] text-slate-400 font-black uppercase">Thời gian máy chủ</p>
+                </div>
+                <div class="relative">
+                    <button onclick="toggleNotifications()" class="w-10 h-10 glass-card flex items-center justify-center text-slate-500 hover:bg-slate-50 relative">
+                        <i class="fas fa-bell"></i>
+                        <span id="notif-dot" class="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
+                    </button>
+                    <!-- NOTIFICATION POPOVER -->
+                    <div id="notification-box" class="hidden absolute top-12 right-0 w-80 glass-card shadow-2xl z-[100] overflow-hidden">
+                        <div class="p-4 border-b border-slate-100 bg-slate-50 font-black text-xs uppercase flex justify-between">
+                            <span>Hộp thư thông báo</span>
+                            <span onclick="clearNotifs()" class="text-indigo-600 text-[10px] cursor-pointer hover:underline">Xóa tất cả</span>
+                        </div>
+                        <div class="max-h-96 overflow-y-auto" id="notification-list">
+                            <!-- Nạp thông báo qua JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-10 space-y-8">
+            
+            <!-- SECTION: TỔNG QUAN -->
+            <section id="sect-tongquan" class="active-section space-y-10">
+                <!-- Welcome Banner -->
+                <div class="relative h-64 rounded-[40px] overflow-hidden group shadow-2xl">
+                    <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1600&auto=format&fit=crop" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-900/90 to-transparent flex items-center px-12">
+                        <div class="max-w-xl text-white space-y-4">
+                            <span class="bg-white/20 backdrop-blur-md px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Dashboard Trung Tâm</span>
+                            <h2 class="text-4xl font-black">Chào mừng, Mr. Sean!</h2>
+                            <p class="text-indigo-100 text-sm font-medium">Báo cáo mới: Tỉ lệ chuyên cần khối 5 tăng 12% so với tuần trước. Hãy kiểm tra các phản hồi kĩ thuật mới từ giáo viên.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="glass-card p-6 border-l-4 border-indigo-500">
+                        <p class="text-[10px] font-black text-slate-400 uppercase">Học sinh đang học</p>
+                        <h4 class="text-2xl font-black mt-2">1,248</h4>
+                        <div class="mt-4 flex items-center gap-2 text-emerald-500 text-[10px] font-bold">
+                            <i class="fas fa-arrow-up"></i> <span>+4% tháng này</span>
+                        </div>
+                    </div>
+                    <div class="glass-card p-6 border-l-4 border-emerald-500">
+                        <p class="text-[10px] font-black text-slate-400 uppercase">Lớp học hoạt động</p>
+                        <h4 class="text-2xl font-black mt-2">42</h4>
+                        <div class="mt-4 flex items-center gap-2 text-slate-500 text-[10px] font-bold">
+                            <i class="fas fa-circle"></i> <span>Đang vận hành</span>
+                        </div>
+                    </div>
+                    <div class="glass-card p-6 border-l-4 border-amber-500">
+                        <p class="text-[10px] font-black text-slate-400 uppercase">Yêu cầu hỗ trợ</p>
+                        <h4 id="ticket-count-stat" class="text-2xl font-black mt-2">0</h4>
+                        <div class="mt-4 flex items-center gap-2 text-amber-500 text-[10px] font-bold">
+                            <i class="fas fa-clock"></i> <span>Cần xử lý gấp</span>
+                        </div>
+                    </div>
+                    <div class="glass-card p-6 border-l-4 border-rose-500">
+                        <p class="text-[10px] font-black text-slate-400 uppercase">Tài liệu mới</p>
+                        <h4 class="text-2xl font-black mt-2">12</h4>
+                        <div class="mt-4 flex items-center gap-2 text-rose-500 text-[10px] font-bold">
+                            <i class="fas fa-plus"></i> <span>Cần phê duyệt</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Row: Lịch Hoạt Động & Tài Liệu -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 glass-card p-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-black text-sm uppercase text-slate-500 tracking-widest"><i class="fas fa-calendar-day mr-2 text-indigo-500"></i>Lịch trình giáo vụ hôm nay</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 rounded-2xl bg-indigo-50/50 border border-indigo-100 flex gap-4 hover:bg-white hover:shadow-lg transition-all cursor-pointer">
+                                <div class="w-12 h-12 bg-white rounded-xl flex flex-col items-center justify-center shadow-sm">
+                                    <span class="text-[10px] font-black text-indigo-600 uppercase">Sáng</span>
+                                    <span class="text-sm font-black">08:30</span>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold">Dự giờ giáo viên mới</p>
+                                    <p class="text-[10px] text-slate-500 mt-1">Lớp 5A • Phòng 201</p>
+                                </div>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100 flex gap-4 hover:bg-white hover:shadow-lg transition-all cursor-pointer">
+                                <div class="w-12 h-12 bg-white rounded-xl flex flex-col items-center justify-center shadow-sm">
+                                    <span class="text-[10px] font-black text-emerald-600 uppercase">Chiều</span>
+                                    <span class="text-sm font-black">14:00</span>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold">Họp kỹ thuật hệ thống</p>
+                                    <p class="text-[10px] text-slate-500 mt-1">Phòng Zoom • Trực tuyến</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tài liệu mới cập nhật -->
+                    <div class="glass-card p-8">
+                        <h3 class="font-black text-sm uppercase text-slate-500 mb-6 tracking-widest"><i class="fas fa-file-invoice mr-2 text-rose-500"></i>Học liệu mới nhất</h3>
+                        <div class="space-y-4" id="resource-list-dashboard">
+                            <!-- Nạp qua JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="glass-card p-8">
+                        <h3 class="font-black text-sm uppercase text-slate-500 mb-6 tracking-widest">Phân bổ học lực khối 5</h3>
+                        <div class="h-64"><canvas id="skillsRadar"></canvas></div>
+                    </div>
+                    <div class="glass-card p-8">
+                        <h3 class="font-black text-sm uppercase text-slate-500 mb-6 tracking-widest">Xu hướng học sinh mới (6 tháng)</h3>
+                        <div class="h-64"><canvas id="growthLine"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Blog Row -->
+                <div class="space-y-6">
+                    <h3 class="text-lg font-black flex items-center gap-3"><i class="fas fa-newspaper text-indigo-500"></i> Tin tức chuyên môn</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="blog-list-dashboard">
+                        <!-- Nạp qua JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: HỒ SƠ & ĐỘI NGŨ -->
+            <section id="sect-caidat" class="hidden-section space-y-10">
+                <!-- Detailed Profile -->
+                <div class="glass-card overflow-hidden">
+                    <div class="h-40 bg-gradient-to-r from-indigo-600 to-purple-700 relative">
+                        <div class="absolute -bottom-16 left-10 flex items-end gap-6">
+                            <img src="https://ui-avatars.com/api/?name=Sean+Eom&background=6366f1&color=fff&size=256" class="w-32 h-32 rounded-3xl border-4 border-white shadow-xl">
+                            <div class="pb-2">
+                                <h3 class="text-2xl font-black text-white">Mr. Sean Eom</h3>
+                                <p class="text-indigo-100 text-xs font-bold uppercase tracking-widest">Giám đốc Học thuật | Founder</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-20 px-10 pb-10">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                            <div class="lg:col-span-2 space-y-8">
+                                <div class="grid grid-cols-2 gap-8">
+                                    <div class="space-y-4">
+                                        <h4 class="text-xs font-black uppercase text-indigo-500 border-b pb-2">Học vấn</h4>
+                                        <div class="space-y-3">
+                                            <div>
+                                                <p class="text-xs font-black">Thạc sĩ Quản lý Giáo dục</p>
+                                                <p class="text-[10px] text-slate-500 font-bold">Đại học Harvard (2015-2017)</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs font-black">Cử nhân Ngôn ngữ Anh</p>
+                                                <p class="text-[10px] text-slate-500 font-bold">ĐH Quốc gia (2010-2014)</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-4">
+                                        <h4 class="text-xs font-black uppercase text-emerald-500 border-b pb-2">Kinh nghiệm</h4>
+                                        <div class="space-y-3">
+                                            <div>
+                                                <p class="text-xs font-black">Hơn 12 năm giảng dạy</p>
+                                                <p class="text-[10px] text-slate-500 font-bold">Chuyên sâu tiếng Anh tiểu học & Cambridge</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs font-black">Tư vấn chương trình học thuật</p>
+                                                <p class="text-[10px] text-slate-500 font-bold">Đối tác 5 hệ thống trường quốc tế</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="space-y-4">
+                                    <h4 class="text-xs font-black uppercase text-amber-500 border-b pb-2">Chứng chỉ & Thành tích</h4>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span class="px-3 py-1.5 bg-slate-100 text-[9px] font-black rounded-lg">IELTS 8.5</span>
+                                        <span class="px-3 py-1.5 bg-slate-100 text-[9px] font-black rounded-lg">TESOL International</span>
+                                        <span class="px-3 py-1.5 bg-slate-100 text-[9px] font-black rounded-lg">Giáo viên tiêu biểu 2023</span>
+                                        <span class="px-3 py-1.5 bg-slate-100 text-[9px] font-black rounded-lg">Bằng khen Sở Giáo dục</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-6">
+                                <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-4">
+                                    <h4 class="font-black text-sm">Liên hệ trực tiếp</h4>
+                                    <p class="text-[10px] font-bold text-slate-400">sean.eom@e-elite.edu.vn</p>
+                                    <p class="text-[10px] font-bold text-slate-400">098.888.xxxx</p>
+                                </div>
+                                <button onclick="editTeacher(0)" class="w-full py-4 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all">Chỉnh sửa hồ sơ</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher Table -->
+                <div class="glass-card p-10">
+                    <div class="flex justify-between items-center mb-8">
+                        <h3 class="text-xl font-black">Danh sách Đội ngũ</h3>
+                        <button onclick="openModalForAdd()" class="px-6 py-3 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest">+ Thêm nhân sự</button>
+                    </div>
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase">
+                                <th class="pb-6 px-4">Giáo viên</th>
+                                <th class="pb-6 px-4">Chuyên môn</th>
+                                <th class="pb-6 px-4 text-center">Trạng thái</th>
+                                <th class="pb-6 px-4 text-right">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacher-table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECTION: BÁO LỖI KĨ THUẬT (BAO TRI) -->
+            <section id="sect-baotri" class="hidden-section space-y-10">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    <!-- Form báo lỗi -->
+                    <div class="lg:col-span-1 space-y-8">
+                        <div class="glass-card p-8 bg-indigo-600 text-white border-none">
+                            <h3 class="text-2xl font-black mb-4">Gửi yêu cầu kĩ thuật</h3>
+                            <p class="text-xs font-medium text-indigo-100 leading-relaxed mb-6">Mô tả chi tiết lỗi hệ thống bạn đang gặp phải để đội ngũ IT hỗ trợ khắc phục nhanh nhất.</p>
+                            <div class="space-y-4 text-slate-900">
+                                <input type="text" id="ticket-title" placeholder="Tiêu đề lỗi (VD: Không tải được PDF)" class="w-full px-5 py-3 rounded-xl text-xs font-bold bg-white outline-none">
+                                <select id="ticket-priority" class="w-full px-5 py-3 rounded-xl text-xs font-bold bg-white outline-none">
+                                    <option value="Thấp">Ưu tiên: Thấp</option>
+                                    <option value="Trung bình">Ưu tiên: Trung bình</option>
+                                    <option value="Cao">Ưu tiên: Cao</option>
+                                    <option value="Khẩn cấp">Ưu tiên: Khẩn cấp</option>
+                                </select>
+                                <textarea id="ticket-desc" placeholder="Mô tả chi tiết lỗi..." rows="4" class="w-full px-5 py-3 rounded-xl text-xs font-bold bg-white outline-none"></textarea>
+                                <button onclick="submitTicket()" class="w-full py-4 bg-white text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-100 transition-all">Gửi yêu cầu ngay</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Danh sách yêu cầu -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="flex justify-between items-center px-2">
+                            <h3 class="text-xl font-black">Lịch sử yêu cầu hỗ trợ</h3>
+                            <div class="flex gap-2">
+                                <span class="bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">Đang xử lý: <span id="pending-count">0</span></span>
+                                <span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">Đã xong: <span id="solved-count">0</span></span>
+                            </div>
+                        </div>
+                        <div class="space-y-4" id="ticket-list">
+                            <!-- Nạp yêu cầu qua JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- COMMON MODAL -->
+    <div id="commonModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[200] flex items-center justify-center hidden p-6">
+        <div id="modalContent" class="glass-card w-full max-w-2xl p-10 space-y-8 animate-slideUp overflow-y-auto max-h-[90vh]">
+            <!-- Nội dung nạp động -->
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        let teachers = [
+            { name: "Sean Eom", role: "Academic Manager", phone: "098888xxxx", email: "sean.eom@e-elite.edu", status: "Active" },
+            { name: "Minh Trang", role: "Lead Teacher", phone: "090123xxxx", email: "trang.m@e-elite.edu", status: "Active" },
+            { name: "Hoàng Anh", role: "IT Support", phone: "091222xxxx", email: "anh.h@e-elite.edu", status: "Active" }
+        ];
+
+        let notifications = [
+            { id: 1, title: "Cập nhật tài liệu Khối 5", desc: "Đã thêm 5 bài tập Reading Unit 12.", content: "Nội dung cập nhật bao gồm các bài đọc hiểu chuyên sâu về nghề nghiệp.", read: false },
+            { id: 2, title: "Lỗi hệ thống đã được sửa", desc: "Lỗi hiển thị avatar giáo viên đã fix.", content: "Cảm ơn quý thầy cô đã báo cáo sự cố.", read: false },
+            { id: 3, title: "Nhắc nhở nộp báo cáo", desc: "Hạn cuối nộp báo cáo tháng 10 là Thứ 6.", content: "Vui lòng hoàn thành báo cáo chuyên môn đúng hạn.", read: false },
+            { id: 4, title: "Họp chuyên môn đột xuất", desc: "Lúc 15h chiều nay tại văn phòng.", content: "Nội dung về việc đổi mới phương pháp giảng dạy Kids.", read: false },
+            { id: 5, title: "Tài liệu Phonics mới", desc: "Video dạy phát âm nguyên âm đơn.", content: "Video hỗ trợ trực quan cho trẻ lớp 5.", read: false }
+        ];
+
+        const resources = [
+            { id: 101, title: "Unit 12 Flashcards.pdf", tag: "Tài liệu", content: "Tải về bộ flashcard nghề nghiệp đầy đủ màu sắc." },
+            { id: 102, title: "Grammar Quiz Lớp 5.docx", tag: "Kiểm tra", content: "Bộ đề trắc nghiệm 30 câu ôn tập ngữ pháp kì I." }
+        ];
+
+        const blogs = [
+            { id: 201, title: "Dạy Tiếng Anh cho trẻ qua Games", image: "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=800", content: "Chia sẻ 5 trò chơi vận động giúp trẻ nhớ từ vựng lâu hơn." },
+            { id: 202, title: "Xử lý tâm lý trẻ lớp 5", image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800", content: "Hiểu về những thay đổi tâm sinh lý của trẻ ở độ tuổi cuối cấp tiểu học." }
+        ];
+
+        let tickets = [
+            { id: 1, title: "Lỗi nộp bài tập", desc: "Học sinh không thể nhấn nút Gửi ở Unit 10.", priority: "Cao", status: "Đang xử lý", time: "10:30 AM" },
+            { id: 2, title: "Audio bị rè", desc: "File nghe 12.1 chất lượng rất thấp.", priority: "Trung bình", status: "Đã xong", time: "Hôm qua" }
+        ];
+
+        // --- CORE LOGIC ---
+
+        function showSection(id) {
+            // Lưu ý: Bây giờ các mục Lớp học, Học sinh, Tài liệu đã chuyển thành file riêng
+            // Hàm này chỉ xử lý các section còn lại trong trang index.html
+            const sections = ['tongquan', 'caidat', 'baotri'];
+            sections.forEach(s => {
+                const sect = document.getElementById('sect-' + s);
+                const btn = document.getElementById('btn-' + s);
+                if(sect) sect.classList.toggle('hidden-section', s !== id);
+                if(sect) sect.classList.toggle('active-section', s === id);
+                if(btn) btn.classList.toggle('active', s === id);
+            });
+            
+            const currentBtn = document.getElementById('btn-'+id);
+            if(currentBtn) {
+                document.getElementById('page-title').innerText = currentBtn.innerText;
+            }
+
+            if(id === 'tongquan') renderDashboard();
+            if(id === 'caidat') renderTeachers();
+            if(id === 'baotri') renderTickets();
+        }
+
+        function toggleNotifications() {
+            document.getElementById('notification-box').classList.toggle('hidden');
+            document.getElementById('notif-dot').classList.add('hidden');
+        }
+
+        function clearNotifs() {
+            notifications = [];
+            renderNotifications();
+            showToast("Hộp thư đã trống");
+        }
+
+        function toggleModal(show = true) {
+            document.getElementById('commonModal').classList.toggle('hidden', !show);
+        }
+
+        // --- RENDERING ---
+
+        function renderNotifications() {
+            const list = document.getElementById('notification-list');
+            if(notifications.length === 0) {
+                list.innerHTML = '<div class="p-8 text-center text-[10px] font-bold text-slate-400">Không có thông báo mới</div>';
+                return;
+            }
+            list.innerHTML = notifications.map(n => `
+                <div onclick="viewDetail('notification', ${n.id})" class="p-4 border-b border-slate-50 hover:bg-indigo-50/50 cursor-pointer transition-all">
+                    <p class="text-[11px] font-black">${n.title}</p>
+                    <p class="text-[9px] text-slate-400 mt-1 line-clamp-1">${n.desc}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderDashboard() {
+            document.getElementById('resource-list-dashboard').innerHTML = resources.map(r => `
+                <div onclick="viewDetail('resource', ${r.id})" class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 cursor-pointer transition-all">
+                    <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-indigo-500 shadow-sm"><i class="fas fa-file-alt"></i></div>
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-[11px] font-black truncate">${r.title}</p>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase">${r.tag}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('blog-list-dashboard').innerHTML = blogs.map(b => `
+                <div onclick="viewDetail('blog', ${b.id})" class="glass-card overflow-hidden group cursor-pointer">
+                    <div class="h-40 bg-slate-200 overflow-hidden">
+                        <img src="${b.image}" class="w-full h-full object-cover group-hover:scale-105 transition-all">
+                    </div>
+                    <div class="p-6">
+                        <h4 class="font-black text-sm group-hover:text-indigo-600">${b.title}</h4>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('ticket-count-stat').innerText = tickets.filter(t => t.status !== 'Đã xong').length;
+        }
+
+        function renderTeachers() {
+            const tbody = document.getElementById('teacher-table-body');
+            tbody.innerHTML = teachers.map((t, idx) => `
+                <tr class="group hover:bg-slate-50 border-b border-slate-50">
+                    <td class="py-6 px-4">
+                        <div class="flex items-center gap-4">
+                            <img src="https://ui-avatars.com/api/?name=${t.name}&background=random" class="w-10 h-10 rounded-xl">
+                            <p class="text-sm font-bold">${t.name}</p>
+                        </div>
+                    </td>
+                    <td class="py-6 px-4 text-xs font-bold text-slate-500">${t.role}</td>
+                    <td class="py-6 px-4 text-center">
+                        <span class="status-badge ${t.status === 'Active' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}">${t.status === 'Active' ? 'Hoạt động' : 'Tạm nghỉ'}</span>
+                    </td>
+                    <td class="py-6 px-4 text-right">
+                        <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100">
+                            <button onclick="editTeacher(${idx})" class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all"><i class="fas fa-edit text-[10px]"></i></button>
+                            <button onclick="deleteTeacher(${idx})" class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-all"><i class="fas fa-trash text-[10px]"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderTickets() {
+            const list = document.getElementById('ticket-list');
+            document.getElementById('pending-count').innerText = tickets.filter(t => t.status === 'Đang xử lý').length;
+            document.getElementById('solved-count').innerText = tickets.filter(t => t.status === 'Đã xong').length;
+            
+            list.innerHTML = tickets.map((t, idx) => `
+                <div class="glass-card p-6 flex items-center justify-between hover:border-indigo-200 transition-all">
+                    <div class="flex gap-6 items-center">
+                        <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
+                            <i class="fas fa-bug"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-3">
+                                <h4 class="text-sm font-black">${t.title}</h4>
+                                <span class="px-2 py-0.5 rounded-md text-[8px] font-black uppercase ${t.priority === 'Khẩn cấp' || t.priority === 'Cao' ? 'bg-rose-100 text-rose-600' : 'bg-slate-100 text-slate-500'}">${t.priority}</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-1">${t.desc}</p>
+                            <p class="text-[9px] text-slate-300 mt-2 font-bold uppercase">${t.time}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-6">
+                        <span class="text-[10px] font-black uppercase ${t.status === 'Đã xong' ? 'text-emerald-500' : 'text-amber-500'}">${t.status}</span>
+                        ${t.status !== 'Đã xong' ? `<button onclick="resolveTicket(${idx})" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all"><i class="fas fa-check"></i></button>` : ''}
+                        <button onclick="deleteTicketItem(${idx})" class="w-8 h-8 rounded-lg bg-slate-50 text-slate-400 hover:bg-rose-500 hover:text-white transition-all"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).reverse().join('');
+        }
+
+        // --- ACTIONS ---
+
+        function viewDetail(type, id) {
+            let item;
+            if(type === 'notification') item = notifications.find(n => n.id === id);
+            else if(type === 'resource') item = resources.find(r => r.id === id);
+            else if(type === 'blog') item = blogs.find(b => b.id === id);
+            if(!item) return;
+
+            document.getElementById('modalContent').innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="text-[9px] font-black text-indigo-500 uppercase">${type}</span>
+                        <h3 class="text-2xl font-black mt-1">${item.title}</h3>
+                    </div>
+                    <button onclick="toggleModal(false)" class="w-8 h-8 rounded-full hover:bg-slate-100"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="py-6 space-y-4">
+                    ${item.image ? `<img src="${item.image}" class="w-full h-48 object-cover rounded-2xl mb-4">` : ''}
+                    <p class="text-slate-600 text-sm font-medium leading-relaxed">${item.content || item.desc}</p>
+                </div>
+                <div class="flex justify-end pt-6 border-t border-slate-100">
+                    <button onclick="toggleModal(false)" class="px-8 py-3 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest">Đóng</button>
+                </div>
+            `;
+            toggleModal(true);
+        }
+
+        function submitTicket() {
+            const title = document.getElementById('ticket-title').value;
+            const desc = document.getElementById('ticket-desc').value;
+            const priority = document.getElementById('ticket-priority').value;
+
+            if(!title || !desc) {
+                showToast("Vui lòng nhập đầy đủ thông tin lỗi!");
+                return;
+            }
+
+            tickets.push({
+                id: tickets.length + 1,
+                title,
+                desc,
+                priority,
+                status: "Đang xử lý",
+                time: "Vừa xong"
+            });
+
+            document.getElementById('ticket-title').value = "";
+            document.getElementById('ticket-desc').value = "";
+            renderTickets();
+            showToast("Đã gửi yêu cầu tới bộ phận Kỹ thuật!");
+        }
+
+        function resolveTicket(idx) {
+            tickets[idx].status = "Đã xong";
+            renderTickets();
+            showToast("Yêu cầu đã được đánh dấu hoàn thành!");
+        }
+
+        function deleteTicketItem(idx) {
+            tickets.splice(idx, 1);
+            renderTickets();
+            showToast("Đã xóa yêu cầu.");
+        }
+
+        function openModalForAdd() {
+            document.getElementById('modalContent').innerHTML = `
+                <h3 class="text-xl font-black mb-6">Thêm nhân sự mới</h3>
+                <div class="space-y-4">
+                    <input type="text" id="add-name" placeholder="Họ và tên" class="w-full px-5 py-3 rounded-xl bg-slate-50 border-none outline-none font-bold text-sm">
+                    <input type="text" id="add-role" placeholder="Vị trí chuyên môn" class="w-full px-5 py-3 rounded-xl bg-slate-50 border-none outline-none font-bold text-sm">
+                    <input type="tel" id="add-phone" placeholder="Số điện thoại" class="w-full px-5 py-3 rounded-xl bg-slate-50 border-none outline-none font-bold text-sm">
+                    <button onclick="saveNewTeacher()" class="w-full py-4 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase mt-4">Lưu nhân sự</button>
+                </div>
+            `;
+            toggleModal(true);
+        }
+
+        function saveNewTeacher() {
+            const name = document.getElementById('add-name').value;
+            const role = document.getElementById('add-role').value;
+            if(!name || !role) return showToast("Nhập thiếu thông tin!");
+            teachers.push({ name, role, phone: document.getElementById('add-phone').value, status: "Active" });
+            renderTeachers();
+            toggleModal(false);
+            showToast("Đã thêm giáo viên!");
+        }
+
+        function editTeacher(idx) {
+            const t = teachers[idx];
+            document.getElementById('modalContent').innerHTML = `
+                <h3 class="text-xl font-black mb-6">Chỉnh sửa: ${t.name}</h3>
+                <div class="space-y-4">
+                    <input type="text" id="edit-name" value="${t.name}" class="w-full px-5 py-3 rounded-xl bg-slate-50 border-none outline-none font-bold text-sm">
+                    <input type="text" id="edit-role" value="${t.role}" class="w-full px-5 py-3 rounded-xl bg-slate-50 border-none outline-none font-bold text-sm">
+                    <select id="edit-status" class="w-full px-5 py-3 rounded-xl bg-slate-50 outline-none font-bold text-sm">
+                        <option value="Active" ${t.status === 'Active' ? 'selected' : ''}>Hoạt động</option>
+                        <option value="Off" ${t.status !== 'Active' ? 'selected' : ''}>Tạm nghỉ</option>
+                    </select>
+                    <button onclick="saveEditTeacher(${idx})" class="w-full py-4 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase mt-4">Cập nhật thay đổi</button>
+                </div>
+            `;
+            toggleModal(true);
+        }
+
+        function saveEditTeacher(idx) {
+            teachers[idx].name = document.getElementById('edit-name').value;
+            teachers[idx].role = document.getElementById('edit-role').value;
+            teachers[idx].status = document.getElementById('edit-status').value;
+            renderTeachers();
+            toggleModal(false);
+            showToast("Đã cập nhật!");
+        }
+
+        function deleteTeacher(idx) {
+            if(idx === 0) return showToast("Không thể xóa Admin chính!");
+            teachers.splice(idx, 1);
+            renderTeachers();
+            showToast("Đã xóa!");
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            t.classList.remove('translate-y-[200%]');
+            setTimeout(() => t.classList.add('translate-y-[200%]'), 3000);
+        }
+
+        function initCharts() {
+            const ctxRadar = document.getElementById('skillsRadar').getContext('2d');
+            new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: ['Nghe', 'Nói', 'Đọc', 'Viết', 'Grammar', 'Phonics'],
+                    datasets: [{
+                        label: 'Trung bình khối 5',
+                        data: [82, 75, 88, 70, 85, 90],
+                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                        borderColor: '#6366f1',
+                        borderWidth: 2
+                    }]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            const ctxLine = document.getElementById('growthLine').getContext('2d');
+            new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['T5', 'T6', 'T7', 'T8', 'T9', 'T10'],
+                    datasets: [{
+                        data: [400, 520, 480, 850, 1100, 1248],
+                        borderColor: '#10b981',
+                        tension: 0.4,
+                        fill: false
+                    }]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        }
+
+        window.onload = function() {
+            initCharts();
+            renderDashboard();
+            renderNotifications();
+            setInterval(() => document.getElementById('clock').innerText = new Date().toLocaleTimeString('vi-VN'), 1000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn Path Kids – Nền Tảng Phát Triển Tư Duy Toàn Diện</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css-files/beginnerlevel.css">
+</head>
+<body>
+
+<header>
+    <div class="lang-switch" onclick="toggleLang()" id="langBtn">VN | EN</div>
+    <h1 id="txt-appname">Beginner Level</h1>
+</header>
+
+<div class="container">
+    <aside class="sidebar">
+        <ul class="sidebar-menu">
+            <li><a href="#" class="active" onclick="showTab('home')"> <span class="nav-home">Trang Chủ</span></a></li>
+            <li><a href="#" onclick="showTab('practice')"><span class="nav-practice">Thực hành</span></a></li>
+            <li><a href="#" onclick="showTab('resources')"><span class="nav-resources">Tài Liệu & Video</span></a></li>
+            <li><a href="#" onclick="showTab('games')"><span class="nav-games">Trò Chơi Học Tập</span></a></li>
+            <li><a href="#" onclick="showTab('ranking')"><span class="nav-ranking">Xếp hạng</span></a></li>
+            <li><a href="#" onclick="showTab('forum')"><span class="nav-forum">Hỏi Đáp / Diễn Đàn</span></a></li>
+        </ul>
+        <div style="margin-top: 20px; padding: 15px; background: var(--lavender); border-radius: 25px; font-size: 0.85em;">
+            <p style="margin-bottom: 5px;"><i class="fas fa-award" style="color:#d4af37"></i> <b class="txt-score-label">Điểm thưởng:</b> <span id="userScore">1580</span></p>
+            <p><i class="fas fa-rocket" style="color:var(--accent-peach)"></i> <b class="txt-level-label">Cấp độ:</b> <span class="txt-level-val">Chuyên gia</span></p>
+        </div>
+    </aside>
+
+    <main>
+        <!-- HOME -->
+        <section id="home" class="section active">
+            <div class="card" style="background: linear-gradient(135deg, var(--white), var(--baby-blue)); position: relative; overflow: hidden;">
+                <h2 class="txt-welcome" style="position: relative; z-index: 1;">Chào mừng bạn quay trở lại! 👋</h2>
+                <div style="margin-top: 20px; position: relative; z-index: 1;">
+                    <button class="btn-pastel" onclick="showTab('resources')">Tiếp tục học ngay</button>
+                    <button class="btn-pastel" style="background: var(--white); border: 2px solid var(--mint); box-shadow: none; margin-left: 10px;" onclick="showTab('forum')"><span class="btn_discussion_room">Vào phòng thảo luận</span></button>
+                </div>
+                <i class="fas fa-graduation-cap" style="position: absolute; right: -20px; bottom: -20px; font-size: 10em; opacity: 0.1; transform: rotate(-15deg);"></i>
+            </div>
+
+            <div class="section-title"><i class="fas fa-bolt" style="color: #ff9f43;"></i> <span class="txt-hot-topics">Sự Kiện & Thách Thức Đang Diễn Ra</span></div>
+            
+            <div class="events-grid">
+                <div class="post-card" style="border-left: 5px solid var(--accent-peach);">
+                    <span class="post-tag eventmonth">SỰ KIỆN THÁNG</span>
+                    <b><span class="title_event_month">Thử thách: 30 Ngày chinh phục Ngữ pháp</span></b>
+                    <p style="font-size: 0.85em;"><span class="description_event_month">Lộ trình được thiết kế riêng giúp bạn nắm vững các thì cơ bản và nâng cao của lớp 5.</span></p>
+                    <div style="margin-top: 10px; font-size: 0.8em; color: var(--text-color);"><i class="fas fa-users"></i><span class="candidate_event_month"> 1,240 người tham gia</span></div>
+                </div>
+                <div class="post-card" style="border-left: 5px solid var(--success);">
+                    <span class="post-tag competition" style="background: var(--success);">CUỘC THI</span>
+                    <b><span class="title_competition">Global Spelling Bee 2024</span> <span class="qualifying_round_competition">Vòng Loại</span></b>
+                    <p style="font-size: 0.85em;"><span class="description_competition">Kiểm tra vốn từ vựng và tốc độ phản xạ để dành vé vào chung kết tại Singapore.</span></p>
+                    <button class="btn-pastel" style="font-size: 0.7em; margin-top: 10px; padding: 5px 15px;"><span class="register_competition">Đăng ký</span></button>
+                </div>
+                <div class="post-card" style="border-left: 5px solid var(--mint);">
+                    <span class="post-tag newskill" style="background: var(--mint);">KỸ NĂNG MỚI</span>
+                    <b><span class="title_newskill">Ứng dụng AI vào việc lập dàn ý</span></b>
+                    <p style="font-size: 0.85em;"><span class="description_newskill">Học cách sử dụng công cụ thông minh để phát triển ý tưởng bài viết sáng tạo.</span></p>
+                </div>
+                <div class="post-card" style="border-left: 5px solid var(--lavender);">
+                    <span class="post-tag guidance" style="background: var(--lavender);">HƯỚNG NGHIỆP</span>
+                    <b><span class="title_guidance">Lớp học: Kỹ năng thuyết trình trước đám đông</span></b>
+                    <p style="font-size: 0.85em;"><span class="description_guidance">Giúp bạn tự tin hơn khi trình bày dự án trên lớp và các cuộc thi quốc tế.</span></p>
+                </div>
+                <div class="post-card" style="border-left: 5px solid #ffcc33;">
+                    <span class="post-tag club" style="background: #fff3cd;">CÂU LẠC BỘ</span>
+                    <b><span class="title_club">Đọc sách cùng Funlish mỗi tối</span></b>
+                    <p style="font-size: 0.85em;"><span class="description_club">Cùng nhau phân tích những cuốn truyện song ngữ nổi tiếng nhất tuần này.</span></p>
+                </div>
+                <div class="post-card" style="border-left: 5px solid #b2bec3;">
+                    <span class="post-tag consultant" style="background: #dfe6e9;">TƯ VẤN</span>
+                    <b><span class="title_consultant">Hỏi đáp: Bí quyết săn học bổng cấp 2</span></b>
+                    <p style="font-size: 0.85em;"><span class="description_consultant">Giao lưu cùng các anh chị cựu học sinh đã đạt học bổng trường chuyên.</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FORUM / Q&A -->
+        <section id="forum" class="section">
+            <div class="card">
+                <h2 class="txt-forum-title">Cộng Đồng Học Tập Trực Tuyến 💬</h2>
+                <div class="post-input-box">
+                    <input type="text" id="forumInput" placeholder="Bạn đang gặp khó khăn ở bài tập nào? Hãy hỏi ở đây nhé!">
+                    <button class="btn-pastel" onclick="addPost()">Đăng Câu Hỏi</button>
+                </div>
+                
+                <div class="section-title" style="font-size: 1.1em; margin-top: 0;">Chủ đề thảo luận sôi nổi</div>
+                <div class="post-list" id="postList">
+                    <div class="post-card">
+                        <span class="post-tag">PHÁT ÂM</span>
+                        <b>Làm sao để không bị ngọng khi nói tiếng Anh?</b>
+                        <p style="font-size: 0.85em; opacity: 0.8;">Bởi: Minh Anh - 1 giờ trước • 12 Bình luận</p>
+                        <hr style="margin: 10px 0; opacity: 0.1;">
+                        <p style="font-size: 0.9em; color: #5B7480;"><b>Gia sư AI Mason:</b> Chào bạn! Bạn hãy thử phương pháp Shadowing (nhại giọng). Hãy xem video "Luyện nói tự nhiên" ở mục Tài liệu nhé!</p>
+                    </div>
+                    <div class="post-card">
+                        <span class="post-tag">NGỮ PHÁP</span>
+                        <b>Phân biệt "Present Perfect" và "Past Simple" siêu dễ</b>
+                        <p style="font-size: 0.85em; opacity: 0.8;">Bởi: Thầy Bình - 3 giờ trước • 45 Bình luận</p>
+                    </div>
+                    <div class="post-card">
+                        <span class="post-tag">HỌC BỔNG</span>
+                        <b>Kinh nghiệm phỏng vấn học bổng ASIA</b>
+                        <p style="font-size: 0.85em; opacity: 0.8;">Bởi: Hoàng Nam - 5 giờ trước • 28 Bình luận</p>
+                    </div>
+                    <div class="post-card">
+                        <span class="post-tag">TÀI LIỆU</span>
+                        <b>Link tải bộ đề thi Olympic Tiếng Anh lớp 5</b>
+                        <p style="font-size: 0.85em; opacity: 0.8;">Bởi: Admin - 1 ngày trước • 156 Bình luận</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RESOURCES -->
+        <section id="resources" class="section">
+            <div class="resource-category">
+                <h2 class="section-title"><i class="fas fa-video"></i> Video Bài Giảng Trực Quan</h2>
+                <div class="resource-grid">
+                    <div class="resource-card">
+                        <div class="video-box">
+                            <i class="fab fa-youtube"></i>
+                            <div class="video-overlay" onclick="window.open('https://www.youtube.com/results?search_query=english+for+kids+grade+5+unit+1', '_blank')"></div>
+                        </div>
+                        <p style="padding: 0 10px;"><b>Unit 1: Bảng chữ cái</b></p>
+                        <small>Thời lượng: 12:45</small>
+                    </div>
+                    <div class="resource-card">
+                        <div class="video-box">
+                            <i class="fab fa-youtube"></i>
+                            <div class="video-overlay" onclick="window.open('https://www.youtube.com/results?search_query=pronunciation+th+sound+kids', '_blank')"></div>
+                        </div>
+                        <p style="padding: 0 10px;"><b>Unit 2: Tìm hiểu IPA</b></p>
+                        <small>Thời lượng: 08:20</small>
+                    </div>
+                    <div class="resource-card">
+                        <div class="video-box">
+                            <i class="fab fa-youtube"></i>
+                            <div class="video-overlay" onclick="window.open('https://www.youtube.com/results?search_query=english+grammar+songs+kids', '_blank')"></div>
+                        </div>
+                        <p style="padding: 0 10px;"><b>Unit 3: Các con số</b></p>
+                        <small>Thời lượng: 05:15</small>
+                    </div>
+                    <div class="resource-card">
+                        <div class="video-box">
+                            <i class="fab fa-youtube"></i>
+                            <div class="video-overlay" onclick="window.open('https://www.youtube.com/results?search_query=reading+comprehension+kids', '_blank')"></div>
+                        </div>
+                        <p style="padding: 0 10px;"><b>Unit 4: Ăn uống</b></p>
+                        <small>Thời lượng: 15:30</small>
+                    </div>
+                    <div class="resource-card">
+                        <div class="video-box">
+                            <i class="fab fa-youtube"></i>
+                            <div class="video-overlay" onclick="window.open('https://www.youtube.com/results?search_query=reading+comprehension+kids', '_blank')"></div>
+                        </div>
+                        <p style="padding: 0 10px;"><b>Unit 5: Động vật</b></p>
+                        <small>Thời lượng: 15:30</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="resource-category">
+                <h2 class="section-title"><i class="fas fa-file-pdf"></i> Thư Viện Tài Liệu PDF & Sách</h2>
+                <div class="resource-grid">
+                    <div class="resource-card" onclick="window.open('https://tiki.vn/search?q=english+grammar+in+use', '_blank')">
+                        <div class="resource-thumb" style="background: #ffeaa7;">📘</div>
+                        <p><b>Grammar in Use (Kids)</b></p>
+                        <small style="color: #d63031">Bán chạy nhất</small>
+                    </div>
+                    <div class="resource-card" onclick="alert('Bắt đầu tải bộ đề 2024...')">
+                        <div class="resource-thumb" style="background: #fab1a0;">📄</div>
+                        <p><b>Bộ đề thi thử HK II</b></p>
+                        <small>PDF Miễn phí</small>
+                    </div>
+                    <div class="resource-card" onclick="window.open('https://fahasa.com', '_blank')">
+                        <div class="resource-thumb" style="background: #a29bfe;">📗</div>
+                        <p><b>Từ điển tranh minh họa</b></p>
+                        <small>Link mua sách</small>
+                    </div>
+                    <div class="resource-card" onclick="alert('Đang mở file Flashcard...')">
+                        <div class="resource-thumb" style="background: #81ecec;">📇</div>
+                        <p><b>Bộ Flashcard Unit 1-10</b></p>
+                        <small>In màu tại nhà</small>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GAMES -->
+        <section id="games" class="section">
+            <div class="card">
+                <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="txt-game-title">Rèn Luyện Trí Nhớ 🍓</h2>
+                    <span id="gameMsg" style="font-weight: bold; color: #2ecc71;"></span>
+                </div>
+                <div id="gameMemoryView">
+                    <div class="memory-grid" id="memGrid"></div>
+                    <center><button class="btn-pastel" style="margin-top: 25px;" onclick="initMemory()">Làm mới ván đấu</button></center>
+                </div>
+            </div>
+        </section>
+
+        <!-- ROOMS -->
+        <section id="rooms" class="section">
+            <div class="card">
+                <h2 class="txt-room-title">Phòng Học Nhóm & Thảo Luận 🏠</h2>
+                <p class="txt-room-sub">Học cùng bạn bè trên khắp mọi miền đất nước.</p>
+                <div id="roomContainer" style="margin-top: 20px;">
+                    <div class="post-card" style="display:flex; justify-content: space-between; align-items: center; background: white;">
+                        <div>
+                            <b>[LAB 01] Luyện Nói Phản Xạ Unit 5</b>
+                            <p style="font-size: 0.8em; opacity:0.7;">Người điều hành: Cô Mai - 14/15 Thành viên</p>
+                        </div>
+                        <button class="btn-pastel" onclick="window.open('https://zoom.us', '_blank')">THAM GIA</button>
+                    </div>
+                    <div class="post-card" style="display:flex; justify-content: space-between; align-items: center; background: white; margin-top: 10px;">
+                        <div>
+                            <b>[LAB 02] Giải đề Olympic Tiếng Anh</b>
+                            <p style="font-size: 0.8em; opacity:0.7;">Người điều hành: Thầy Tâm - 5/10 Thành viên</p>
+                        </div>
+                        <button class="btn-pastel" onclick="window.open('https://zoom.us', '_blank')">THAM GIA</button>
+                    </div>
+                </div>
+                <button class="btn-pastel" style="width: 100%; margin-top: 20px; background: var(--baby-blue); padding: 15px;" onclick="openRoomForm()">+ Khởi tạo phòng học nhóm mới</button>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="roomModal">
+    <div class="modal-content">
+        <div id="roomFormBody">
+            <h3 style="margin-bottom: 15px;">Thông Tin Phòng Thảo Luận</h3>
+            <label style="font-size: 0.8em;">Tên phòng (Chủ đề học):</label>
+            <input type="text" id="inpRoomName" placeholder="Ví dụ: Cùng ôn thi giữa kỳ..." style="width:100%; padding:12px; border-radius:12px; border:1px solid #eee; margin-bottom:15px; outline: none; background: #fdfdfd;">
+            <label style="font-size: 0.8em;">Liên kết phòng (Zoom/Meet/Zalo):</label>
+            <input type="text" id="inpRoomLink" placeholder="Dán link phòng học vào đây..." style="width:100%; padding:12px; border-radius:12px; border:1px solid #eee; margin-bottom:15px; outline: none; background: #fdfdfd;">
+            <button class="btn-pastel" style="width: 100%; padding: 15px;" onclick="createRoom()">GỬI PHÊ DUYỆT</button>
+            <button onclick="closeModal()" style="margin-top: 15px; width: 100%; background: none; border: none; cursor: pointer; opacity: 0.6; font-size: 0.9em;">Quay lại</button>
+        </div>
+        <div class="loading-overlay" id="loadingArea">
+            <div class="spinner"></div>
+            <p style="margin-top: 15px;"><b>Mason đang gửi dữ liệu phê duyệt...</b></p>
+            <p style="font-size: 0.8em; opacity: 0.6;">Đảm bảo tính an toàn cho cộng đồng học viên.</p>
+        </div>
+    </div>
+</div>
+
+<script src="scripts/data-language-configs/beginner-language-config.js"></script>
+<script src="scripts/begginner/beginner.js"></script>
+</body>
+</html>
